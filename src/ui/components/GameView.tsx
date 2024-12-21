@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import { defineComponent, inject, onMounted, ref, watch } from 'vue';
-import { IUIServices, servicesKey } from '../../UIController';
-import { UIDataManager } from "../../ui/data/UIDataManager";
-import { GameEvents } from "../../ui/events/GameEvents";
-import { UIEventManager } from "../../ui/events/UIEventManager";
+import type { IUIServices } from '../../UIController';
+import { servicesKey } from '../../UIController';
+import { UIDataManager } from "../data/UIDataManager";
+import { GameEvents } from "../events/GameEvents";
+import { UIEventManager } from "../events/UIEventManager";
 
 export default defineComponent({
   name: 'GameView',
@@ -12,10 +13,6 @@ export default defineComponent({
     const services: IUIServices = inject(servicesKey) as IUIServices;
     const uiEventManager: UIEventManager = services.eventManager;
     const uiDataManager: UIDataManager = services.dataManager;
-
-    /*function updateScore(event: ScoreEvent): void {
-      score.value += event.data.score;
-    }*/
 
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
@@ -34,12 +31,6 @@ export default defineComponent({
         //this.load.image('sky', 'path/to/sky.png');
       }
 
-      /*function createEmptyIHitData(): IHitData {
-        return {
-          enemy: 0
-        };
-      }*/
-
       function create(this: Phaser.Scene) {
         this.add.image(400, 300, 'sky');
         this.input.on('pointerdown', () => {
@@ -50,11 +41,7 @@ export default defineComponent({
 
     watch(uiDataManager.gameScore.score.ref, (newValue) => {
       score.value = newValue;
-  });
-
-    /*if (eventDispatcher) {
-      eventDispatcher.addEventListener(ScoreEvent.UPDATED, () => updateScore);
-    }*/
+    });
 
     return () => (
       <div>

@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import '../src/assets/style.css';
-import GameRoot from './components/view/GameView';
+import GameRoot from './ui/components/GameView';
 import { UIDataManager } from "./ui/data/UIDataManager";
 import { UIEventManager } from "./ui/events/UIEventManager";
 

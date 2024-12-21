@@ -1,8 +1,8 @@
-import { UIDataManager } from "../../ui/data/UIDataManager";
-import { GameEvents } from "../../ui/events/GameEvents";
-import { UIEventManager } from "../../ui/events/UIEventManager";
-import { UIController } from '../../UIController';
+import { UIController } from '../UIController';
 import { GameModel } from '../model/GameModel';
+import { UIDataManager } from "../ui/data/UIDataManager";
+import { GameEvents } from "../ui/events/GameEvents";
+import { UIEventManager } from "../ui/events/UIEventManager";
 
 export class GameController {
   private model: GameModel;

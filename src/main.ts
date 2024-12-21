@@ -1,4 +1,4 @@
-import { GameController } from "./components/controller/GameController";
+import { GameController } from "./controller/GameController";
 
 async function init() {
     const gameController = new GameController();
