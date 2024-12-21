@@ -1,25 +1,51 @@
 import { createApp } from 'vue';
 import '../src/assets/style.css';
-import EventDispatcher from './common/event/EventDispatcher';
-import GameRoot from './components/Game';
+import GameRoot from './components/view/GameView';
+import { UIDataManager } from "./ui/data/UIDataManager";
+import { UIEventManager } from "./ui/events/UIEventManager";
+
+export const servicesKey = Symbol();
+
+export interface IUIServices {
+    eventManager: UIEventManager;
+    dataManager: UIDataManager;
+}
 
 export class UIController {
 
     private _gameUIRoot: HTMLElement;
+    private _uiEventManager: UIEventManager;
+    private _uiDataManager: UIDataManager;
+    private _services: IUIServices;
 
     constructor() {
         this._gameUIRoot = document.createElement("div");
         this._gameUIRoot.id = "GameUIRoot";
+        this._uiEventManager = new UIEventManager();
+        this._uiDataManager = new UIDataManager();
+
+        this._services = {
+            eventManager: this._uiEventManager,
+            dataManager: this._uiDataManager
+        };
     }
 
     public createGame(): void {
         console.log("create game history UI");
         const app = createApp(GameRoot);
-        app.provide('eventDispatcher', EventDispatcher.getInstance());
+        app.provide(servicesKey, this._services);
         app.mount(this._gameUIRoot);
     }
 
-    public getGameHistoryUIRoot(): HTMLElement {
+    public getGameUIRoot(): HTMLElement {
         return this._gameUIRoot;
+    }
+
+    public get dataManager(): UIDataManager {
+        return this._uiDataManager;
+    }
+
+    public get eventManager(): UIEventManager {
+        return this._uiEventManager;
     }
 }

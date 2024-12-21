@@ -1,18 +1,21 @@
 import Phaser from 'phaser';
-import { defineComponent, inject, onMounted, ref } from 'vue';
-import type { IEventDispatcher } from '../../common/event/IEventDispatcher';
-import type { IScoreData } from '../data/IScoreData';
-import { ScoreEvent } from '../event/ScoreEvent';
+import { defineComponent, inject, onMounted, ref, watch } from 'vue';
+import { IUIServices, servicesKey } from '../../UIController';
+import { UIDataManager } from "../../ui/data/UIDataManager";
+import { GameEvents } from "../../ui/events/GameEvents";
+import { UIEventManager } from "../../ui/events/UIEventManager";
 
 export default defineComponent({
   name: 'GameView',
   setup() {
     const score = ref(0);
-    const eventDispatcher = inject<IEventDispatcher>('eventDispatcher');
+    const services: IUIServices = inject(servicesKey) as IUIServices;
+    const uiEventManager: UIEventManager = services.eventManager;
+    const uiDataManager: UIDataManager = services.dataManager;
 
-    function updateScore(event: ScoreEvent) :void{
+    /*function updateScore(event: ScoreEvent): void {
       score.value += event.data.score;
-    }
+    }*/
 
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
@@ -28,30 +31,30 @@ export default defineComponent({
       new Phaser.Game(config);
 
       function preload(this: Phaser.Scene) {
-        this.load.image('sky', 'path/to/sky.png');
+        //this.load.image('sky', 'path/to/sky.png');
       }
 
-      function createEmptyIScoreData(): IScoreData {
+      /*function createEmptyIHitData(): IHitData {
         return {
-            score: 0
+          enemy: 0
         };
-    }
+      }*/
 
       function create(this: Phaser.Scene) {
         this.add.image(400, 300, 'sky');
         this.input.on('pointerdown', () => {
-          if (eventDispatcher) {
-            let scoreData = createEmptyIScoreData();
-            scoreData.score = 10;
-            eventDispatcher.dispatchEvent(new ScoreEvent(ScoreEvent.UPDATED, scoreData));
-          }
+          uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
         });
       }
     });
 
-    if (eventDispatcher) {
-      eventDispatcher.addEventListener(ScoreEvent.UPDATED, updateScore);
-    }
+    watch(uiDataManager.gameScore.score.ref, (newValue) => {
+      score.value = newValue;
+  });
+
+    /*if (eventDispatcher) {
+      eventDispatcher.addEventListener(ScoreEvent.UPDATED, () => updateScore);
+    }*/
 
     return () => (
       <div>

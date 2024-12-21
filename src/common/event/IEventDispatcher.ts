@@ -1,7 +1,7 @@
-import type { IEvent } from "./IEvent";
+import type { IEvent } from './IEvent';
 
 export interface IEventDispatcher {
-    addEventListener(eventType: string, listener: any, scope?: any): void;
-    removeEventListener(eventType: string, listener: any, scope?: any): void;
-    dispatchEvent(event: IEvent): void;
+  addEventListener(type: string, listener: (event: IEvent) => void): void;
+  removeEventListener(type: string, listener: (event: IEvent) => void): void;
+  dispatchEvent(event: IEvent): void;
 }

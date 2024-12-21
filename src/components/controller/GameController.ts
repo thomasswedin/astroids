@@ -1,36 +1,41 @@
-import { inject } from 'vue';
-import type { IEventDispatcher } from '../../common/event/IEventDispatcher';
+import { UIDataManager } from "../../ui/data/UIDataManager";
+import { GameEvents } from "../../ui/events/GameEvents";
+import { UIEventManager } from "../../ui/events/UIEventManager";
 import { UIController } from '../../UIController';
-import type { IScoreData } from '../data/IScoreData';
-import { ScoreEvent } from '../event/ScoreEvent';
 import { GameModel } from '../model/GameModel';
 
 export class GameController {
-  private eventDispatcher: IEventDispatcher;
   private model: GameModel;
   private uiController!: UIController;
 
   constructor() {
     this.model = new GameModel();
-    this.eventDispatcher = inject<IEventDispatcher>('eventDispatcher')!;
     this.uiController = new UIController();
     this.uiController.createGame();
   }
 
-  public getGameHistoryUIRoot(): HTMLElement {
-    return this.uiController.getGameHistoryUIRoot();
-}
-
-  public increaseScore(): void {
-    this.model.incrementScore();
-    let scoreData = this.createEmptyIScoreData();
-    scoreData.score = this.model.getScore();
-    this.eventDispatcher.dispatchEvent(new ScoreEvent(ScoreEvent.UPDATED, scoreData));
+  public getGameUIEventManager(): UIEventManager {
+    return this.uiController.eventManager;
   }
 
-  protected createEmptyIScoreData(): IScoreData {
-          return {
-              score: 0
-          };
-      }
+  public getGameUIDataManager(): UIDataManager {
+    return this.uiController.dataManager;
+  }
+
+  public getGameUIRoot(): HTMLElement {
+    return this.uiController.getGameUIRoot();
+  }
+
+  public initializeGameUI(): void {
+    this.addEventListeners();
+  }
+
+  public onHitEvent(): void {
+    this.model.incrementScore();
+    this.getGameUIDataManager().gameScore.score.value = this.model.getScore();
+  }
+
+  protected addEventListeners(): void {
+    this.getGameUIEventManager().addEventListener(GameEvents.HitEvent, this.onHitEvent, this);
+  }
 }

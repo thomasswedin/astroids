@@ -1,5 +1,8 @@
-import type { IEvent } from "./IEvent";
+import type { IEvent } from './IEvent';
 
 export class Event implements IEvent {
-    constructor(public eventType: string) {}
+  public type: string;
+  constructor(type: string) {
+    this.type = type;
+  }
 }
