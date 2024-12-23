@@ -1,30 +1,30 @@
-export interface IUIEventListenerOptions {
-	once: boolean
+export interface IEventListenerOptions {
+	once: boolean;
 }
 
-interface IUIEventListener {
+export interface IEventListener {
 	scope: any;
-	options: IUIEventListenerOptions | undefined,
+	options: IEventListenerOptions | undefined;
 	eventHandler: Function;
 }
 
-export interface IUIEvent {
+export interface IEvent {
 	data?: any;
 }
 
-export class UIEventManager {
-	private _eventListenersMap: Map<IUIEvent, IUIEventListener[]> = new Map();
+export class EventManager {
+	private _eventListenersMap: Map<IEvent, IEventListener[]> = new Map();
 
 	public dispose(): void {
 		this._eventListenersMap.clear();
 	}
 
-	public dispatchEvent<T extends IUIEvent>(event: T, data?: T["data"]): void {
+	public dispatchEvent<T extends IEvent>(event: T, data?: T["data"]): void {
 		const listeners = this._eventListenersMap.get(event);
 		if (listeners) {
-			const listenersToRemove: IUIEventListener[] = [];
+			const listenersToRemove: IEventListener[] = [];
 
-			listeners.forEach((listener: IUIEventListener) => {
+			listeners.forEach((listener: IEventListener) => {
 				if (listener.scope) {
 					listener.eventHandler.apply(listener.scope, [data]);
 				} else {
@@ -44,7 +44,7 @@ export class UIEventManager {
 		}
 	}
 
-	public addEventListener<T extends IUIEvent>(event: T, callback: (event: T["data"]) => void, scope?: any, options?: IUIEventListenerOptions): void {
+	public addEventListener<T extends IEvent>(event: T, callback: (event: T["data"]) => void, scope?: any, options?: IEventListenerOptions): void {
 		let listeners = this._eventListenersMap.get(event);
 		if (!listeners) {
 			listeners = [];
@@ -63,7 +63,7 @@ export class UIEventManager {
 		}
 	}
 
-	public removeEventListener<T extends IUIEvent>(event: T, callback: (event: T["data"]) => void, scope?: any): void {
+	public removeEventListener<T extends IEvent>(event: T, callback: (event: T["data"]) => void, scope?: any): void {
 		const listeners = this._eventListenersMap.get(event);
 		if (listeners) {
 			let firstMismatchingScopeListenerIndex: number = -1;

@@ -1,8 +1,9 @@
-import { UIController } from '../UIController';
 import { GameModel } from '../model/GameModel';
 import { UIDataManager } from "../ui/data/UIDataManager";
-import { GameEvents } from "../ui/events/GameEvents";
-import { UIEventManager } from "../ui/events/UIEventManager";
+import { GameEventManager } from "../ui/events/game/GameEventManager";
+import { GameEvents } from "../ui/events/game/GameEvents";
+import { UIEventManager } from "../ui/events/ui/UIEventManager";
+import { UIController } from '../UIController';
 
 export class GameController {
   private model: GameModel;
@@ -14,8 +15,12 @@ export class GameController {
     this.uiController.createGame();
   }
 
-  public getGameUIEventManager(): UIEventManager {
-    return this.uiController.eventManager;
+  public getUIEventManager(): UIEventManager {
+    return this.uiController.uiEventManager;
+  }
+
+  public getGameEventManager(): GameEventManager {
+    return this.uiController.uiEventManager;
   }
 
   public getGameUIDataManager(): UIDataManager {
@@ -36,6 +41,6 @@ export class GameController {
   }
 
   protected addEventListeners(): void {
-    this.getGameUIEventManager().addEventListener(GameEvents.HitEvent, this.onHitEvent, this);
+    this.getGameEventManager().addEventListener(GameEvents.HitEvent, this.onHitEvent, this);
   }
 }

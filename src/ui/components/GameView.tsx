@@ -3,8 +3,9 @@ import { defineComponent, inject, onMounted, ref, watch } from 'vue';
 import type { IUIServices } from '../../UIController';
 import { servicesKey } from '../../UIController';
 import { UIDataManager } from "../data/UIDataManager";
-import { GameEvents } from "../events/GameEvents";
-import { UIEventManager } from "../events/UIEventManager";
+import { GameEventManager } from "../events/game/GameEventManager";
+import { GameEvents } from "../events/game/GameEvents";
+import { UIEventManager } from "../events/ui/UIEventManager";
 import Background from './Background';
 
 export default defineComponent({
@@ -12,7 +13,8 @@ export default defineComponent({
   setup() {
     const score = ref(0);
     const services: IUIServices = inject(servicesKey) as IUIServices;
-    const uiEventManager: UIEventManager = services.eventManager;
+    const uiEventManager: UIEventManager = services.uiEventManager;
+    const gameEventManager: GameEventManager = services.gameEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
 
     onMounted(() => {
@@ -35,6 +37,7 @@ export default defineComponent({
       function create(this: Phaser.Scene) {
         this.input.on('pointerdown', () => {
           uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
+          gameEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
         });
       }
     });

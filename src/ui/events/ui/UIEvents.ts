@@ -1,4 +1,4 @@
-import { KeypadActions as ButtonActions } from "../actions/ButtonActions";
+import { KeypadActions as ButtonActions } from "../../actions/ButtonActions";
 
 export interface IUIEventButtonActionData {
 	action: ButtonActions;
