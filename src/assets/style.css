@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #f34242;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -65,9 +65,41 @@ button:focus-visible {
   text-align: center;
 }
 
+#GameUIRoot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  border: fuchsia 1px solid;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  border: fuchsia 1px solid;
+}
+
+#score-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white
+}
+
+#background-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white
+}
+
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
+    color: #f34242;
     background-color: #ffffff;
   }
   a:hover {

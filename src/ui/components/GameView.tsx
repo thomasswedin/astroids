@@ -5,6 +5,7 @@ import { servicesKey } from '../../UIController';
 import { UIDataManager } from "../data/UIDataManager";
 import { GameEvents } from "../events/GameEvents";
 import { UIEventManager } from "../events/UIEventManager";
+import Background from './Background';
 
 export default defineComponent({
   name: 'GameView',
@@ -32,7 +33,6 @@ export default defineComponent({
       }
 
       function create(this: Phaser.Scene) {
-        this.add.image(400, 300, 'sky');
         this.input.on('pointerdown', () => {
           uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
         });
@@ -45,8 +45,9 @@ export default defineComponent({
 
     return () => (
       <div>
+        <div id='score-container'>Score: {score.value}</div>
+        <Background/>
         <div id="game-container"></div>
-        <p>Score: {score.value}</p>
       </div>
     );
   },
