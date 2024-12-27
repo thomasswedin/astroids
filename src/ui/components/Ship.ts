@@ -30,6 +30,22 @@ export class Ship extends Phaser.GameObjects.Sprite {
     }
 
     protected create() {
+        const shipVec = this.drawShip();
+    
+        // Generate a larger texture to include the entire ship
+        const shipTextureKey = 'shipTexture';
+        shipVec.generateTexture(shipTextureKey, 40, 40); // Increased size
+        this.setTexture(shipTextureKey);
+        shipVec.destroy();
+    
+        // Add the ship to the scene
+        //this.scene.add.existing(shipVec);
+        this.scene.add.existing(this);
+        this.scene.physics.add.existing(this);
+        this.scene.physics.world.enable(this);
+    }
+
+    protected drawShip(): Phaser.GameObjects.Graphics {
         const shipVec = new Phaser.GameObjects.Graphics(this.scene);
         // Set shipVec x and y to the center of the screen
         shipVec.x = this.scene.cameras.main.width / 2;
@@ -57,17 +73,8 @@ export class Ship extends Phaser.GameObjects.Sprite {
         // Add a dot to the ship's center to make it easier to see the ship's position
         shipVec.fillStyle(0xffffff);
         shipVec.fillCircle(20, 20, 2); // Offset center
-    
-        // Generate a larger texture to include the entire ship
-        const shipTextureKey = 'shipTexture';
-        shipVec.generateTexture(shipTextureKey, 40, 40); // Increased size
-        this.setTexture(shipTextureKey);
-    
-        // Add the ship to the scene
-        this.scene.add.existing(shipVec);
-        this.scene.add.existing(this);
-        this.scene.physics.add.existing(this);
-        this.scene.physics.world.enable(this);
+
+        return shipVec;
     }
 
     public moveShip(): void {
