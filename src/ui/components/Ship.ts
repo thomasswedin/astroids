@@ -9,6 +9,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
     //private shipVec: Phaser.GameObjects.Graphics;
     private shipTextureKey: string = "shipTexture";
     private _afterburnerActive: boolean = false;
+    private _scaleFactor = 1.5;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'ship');
@@ -42,7 +43,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
         const shipVec = this.drawShip();
 
         // Generate a larger texture to include the entire ship
-        shipVec.generateTexture(this.shipTextureKey, 40, 40);
+        shipVec.generateTexture(this.shipTextureKey, (40 * this._scaleFactor), (40 * this._scaleFactor));
         this.setTexture(this.shipTextureKey);
     }
 
@@ -51,23 +52,21 @@ export class Ship extends Phaser.GameObjects.Sprite {
         shipGraphics.x = this.scene.cameras.main.width / 2;
         shipGraphics.y = this.scene.cameras.main.height / 2;
 
-        const scaleFactor = 1;
-
         const shipPoints = [
-            { x: 0, y: -20 * scaleFactor },
-            { x: 10 * scaleFactor, y: 10 * scaleFactor },
-            { x: 9 * scaleFactor, y: 6 * scaleFactor },
-            { x: -9 * scaleFactor, y: 6 * scaleFactor },
-            { x: -10 * scaleFactor, y: 10 * scaleFactor },
-            { x: 0, y: -20 * scaleFactor }
+            { x: 0, y: -20 * this._scaleFactor },
+            { x: 10 * this._scaleFactor, y: 10 * this._scaleFactor },
+            { x: 9 * this._scaleFactor, y: 6 * this._scaleFactor },
+            { x: -9 * this._scaleFactor, y: 6 * this._scaleFactor },
+            { x: -10 * this._scaleFactor, y: 10 * this._scaleFactor },
+            { x: 0, y: -20 * this._scaleFactor }
         ];
 
         // Draw the ship
         shipGraphics.lineStyle(2, 0xffffff);
         shipGraphics.beginPath();
-        shipGraphics.moveTo(shipPoints[0].x + 20, shipPoints[0].y + 20); // Offset points
+        shipGraphics.moveTo(shipPoints[0].x + 20, shipPoints[0].y + (20 * this._scaleFactor)); // Offset points
         for (let i = 1; i < shipPoints.length; i++) {
-            shipGraphics.lineTo(shipPoints[i].x + 20, shipPoints[i].y + 20); // Offset points
+            shipGraphics.lineTo(shipPoints[i].x + 20, shipPoints[i].y + (20 * this._scaleFactor)); // Offset points
         }
         shipGraphics.closePath();
         shipGraphics.strokePath();
@@ -90,17 +89,17 @@ export class Ship extends Phaser.GameObjects.Sprite {
         ];*/
 
         const afterburnerPoints = [
-            { x: -6, y: 4 },
-            { x: 0, y: 16 },
-            { x: 4, y: 6 }
+            { x: -4 * this._scaleFactor, y: 6 * this._scaleFactor },
+            { x: 0, y: 14 * this._scaleFactor },
+            { x: 4 * this._scaleFactor, y: 6 * this._scaleFactor }
         ];
 
         // Draw the afterburner
-        shipVec.lineStyle(1, 0xFFFFFF);
+        shipVec.lineStyle(1.5, 0xFFFFFF);
         shipVec.beginPath();
-        shipVec.moveTo(afterburnerPoints[0].x + 20, afterburnerPoints[0].y + 20); // Offset points
+        shipVec.moveTo(afterburnerPoints[0].x + 20, afterburnerPoints[0].y + (20 * this._scaleFactor)); // Offset points
         for (let i = 1; i < afterburnerPoints.length; i++) {
-            shipVec.lineTo(afterburnerPoints[i].x + 20, afterburnerPoints[i].y + 20); // Offset points
+            shipVec.lineTo(afterburnerPoints[i].x + 20, afterburnerPoints[i].y + (20 * this._scaleFactor)); // Offset points
         }
         shipVec.closePath();
         shipVec.strokePath();
@@ -112,7 +111,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
             this.drawAfterburner(shipVec);
         }
         this.scene.textures.remove(this.shipTextureKey); // Clear the existing texture
-        shipVec.generateTexture(this.shipTextureKey, 40, 40);
+        shipVec.generateTexture(this.shipTextureKey, (40 * this._scaleFactor), (40 * this._scaleFactor));
         this.setTexture(this.shipTextureKey);
 
         shipVec.destroy();
