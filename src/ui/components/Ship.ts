@@ -55,8 +55,8 @@ export class Ship extends Phaser.GameObjects.Sprite {
         const shipPoints = [
             { x: 0, y: -20 * this._scaleFactor },
             { x: 10 * this._scaleFactor, y: 10 * this._scaleFactor },
-            { x: 9 * this._scaleFactor, y: 6 * this._scaleFactor },
-            { x: -9 * this._scaleFactor, y: 6 * this._scaleFactor },
+            { x: 8.5 * this._scaleFactor, y: 6 * this._scaleFactor },
+            { x: -8.5 * this._scaleFactor, y: 6 * this._scaleFactor },
             { x: -10 * this._scaleFactor, y: 10 * this._scaleFactor },
             { x: 0, y: -20 * this._scaleFactor }
         ];
@@ -64,9 +64,9 @@ export class Ship extends Phaser.GameObjects.Sprite {
         // Draw the ship
         shipGraphics.lineStyle(2, 0xffffff);
         shipGraphics.beginPath();
-        shipGraphics.moveTo(shipPoints[0].x + 20, shipPoints[0].y + (20 * this._scaleFactor)); // Offset points
+        shipGraphics.moveTo(shipPoints[0].x + (20 * this._scaleFactor), shipPoints[0].y + (20 * this._scaleFactor)); // Offset points
         for (let i = 1; i < shipPoints.length; i++) {
-            shipGraphics.lineTo(shipPoints[i].x + 20, shipPoints[i].y + (20 * this._scaleFactor)); // Offset points
+            shipGraphics.lineTo(shipPoints[i].x + (20 * this._scaleFactor), shipPoints[i].y + (20 * this._scaleFactor)); // Offset points
         }
         shipGraphics.closePath();
         shipGraphics.strokePath();
@@ -90,16 +90,16 @@ export class Ship extends Phaser.GameObjects.Sprite {
 
         const afterburnerPoints = [
             { x: -4 * this._scaleFactor, y: 6 * this._scaleFactor },
-            { x: 0, y: 14 * this._scaleFactor },
+            { x: 0, y: 12 * this._scaleFactor },
             { x: 4 * this._scaleFactor, y: 6 * this._scaleFactor }
         ];
 
         // Draw the afterburner
         shipVec.lineStyle(1.5, 0xFFFFFF);
         shipVec.beginPath();
-        shipVec.moveTo(afterburnerPoints[0].x + 20, afterburnerPoints[0].y + (20 * this._scaleFactor)); // Offset points
+        shipVec.moveTo(afterburnerPoints[0].x + (20 * this._scaleFactor), afterburnerPoints[0].y + (20 * this._scaleFactor)); // Offset points
         for (let i = 1; i < afterburnerPoints.length; i++) {
-            shipVec.lineTo(afterburnerPoints[i].x + 20, afterburnerPoints[i].y + (20 * this._scaleFactor)); // Offset points
+            shipVec.lineTo(afterburnerPoints[i].x + (20 * this._scaleFactor), afterburnerPoints[i].y + (20 * this._scaleFactor)); // Offset points
         }
         shipVec.closePath();
         shipVec.strokePath();
