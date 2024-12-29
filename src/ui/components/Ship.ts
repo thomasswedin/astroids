@@ -49,57 +49,49 @@ export class Ship extends Phaser.GameObjects.Sprite {
 
     protected drawShip(): Phaser.GameObjects.Graphics {
         const shipGraphics = new Phaser.GameObjects.Graphics(this.scene);
-        shipGraphics.x = this.scene.cameras.main.width / 2;
-        shipGraphics.y = this.scene.cameras.main.height / 2;
+        const offset = 20 * this._scaleFactor;
 
         const shipPoints = [
-            { x: 0, y: -20 * this._scaleFactor },
-            { x: 10 * this._scaleFactor, y: 10 * this._scaleFactor },
-            { x: 8.5 * this._scaleFactor, y: 6 * this._scaleFactor },
-            { x: -8.5 * this._scaleFactor, y: 6 * this._scaleFactor },
-            { x: -10 * this._scaleFactor, y: 10 * this._scaleFactor },
-            { x: 0, y: -20 * this._scaleFactor }
-        ];
+            { x: 0, y: -20 },
+            { x: 10, y: 10 },
+            { x: 8.5, y: 6 },
+            { x: -8.5, y: 6 },
+            { x: -10, y: 10 },
+            { x: 0, y: -20 }
+        ].map(point => ({
+            x: point.x * this._scaleFactor + offset,
+            y: point.y * this._scaleFactor + offset
+        }));
 
         // Draw the ship
         shipGraphics.lineStyle(2, 0xffffff);
         shipGraphics.beginPath();
-        shipGraphics.moveTo(shipPoints[0].x + (20 * this._scaleFactor), shipPoints[0].y + (20 * this._scaleFactor)); // Offset points
+        shipGraphics.moveTo(shipPoints[0].x, shipPoints[0].y);
         for (let i = 1; i < shipPoints.length; i++) {
-            shipGraphics.lineTo(shipPoints[i].x + (20 * this._scaleFactor), shipPoints[i].y + (20 * this._scaleFactor)); // Offset points
+            shipGraphics.lineTo(shipPoints[i].x, shipPoints[i].y);
         }
         shipGraphics.closePath();
         shipGraphics.strokePath();
-
-        // Add a dot to the ship's center to make it easier to see the ship's position
-        //shipGraphics.fillStyle(0xffffff);
-        //shipGraphics.fillCircle(20, 20, 2); // Offset center
 
         return shipGraphics;
     }
 
     protected drawAfterburner(shipVec: Phaser.GameObjects.Graphics): void {
-        // Define the points of the afterburner
-        /*const afterburnerPoints = [
-            { x: 0, y: 10 },
-            { x: 5, y: 15 },
-            { x: 0, y: 20 },
-            { x: -5, y: 15 },
-            { x: 0, y: 10 }
-        ];*/
-
         const afterburnerPoints = [
-            { x: -4 * this._scaleFactor, y: 6 * this._scaleFactor },
-            { x: 0, y: 12 * this._scaleFactor },
-            { x: 4 * this._scaleFactor, y: 6 * this._scaleFactor }
-        ];
+            { x: -6, y: 6 },
+            { x: 0, y: 14 },
+            { x: 6, y: 6 }
+        ].map(point => ({
+            x: point.x * this._scaleFactor + 20 * this._scaleFactor,
+            y: point.y * this._scaleFactor + 20 * this._scaleFactor
+        }));
 
         // Draw the afterburner
         shipVec.lineStyle(1.5, 0xFFFFFF);
         shipVec.beginPath();
-        shipVec.moveTo(afterburnerPoints[0].x + (20 * this._scaleFactor), afterburnerPoints[0].y + (20 * this._scaleFactor)); // Offset points
+        shipVec.moveTo(afterburnerPoints[0].x, afterburnerPoints[0].y);
         for (let i = 1; i < afterburnerPoints.length; i++) {
-            shipVec.lineTo(afterburnerPoints[i].x + (20 * this._scaleFactor), afterburnerPoints[i].y + (20 * this._scaleFactor)); // Offset points
+            shipVec.lineTo(afterburnerPoints[i].x, afterburnerPoints[i].y);
         }
         shipVec.closePath();
         shipVec.strokePath();
@@ -118,70 +110,58 @@ export class Ship extends Phaser.GameObjects.Sprite {
     }
 
     protected moveShip(): void {
-        if (this.body) {
-            const body = this.body as Phaser.Physics.Arcade.Body;
+        if (!this.body) return;
 
-            if (this.cursors.up?.isDown) {
-                const currentVelocity = new Phaser.Math.Vector2(body.velocity.x, body.velocity.y);
-                const angleInRadians = Phaser.Math.DegToRad(this.angle - 90);
-                const accelerationVector = new Phaser.Math.Vector2(
-                    Math.cos(angleInRadians) * this.acceleration,
-                    Math.sin(angleInRadians) * this.acceleration
-                );
+        const body = this.body as Phaser.Physics.Arcade.Body;
+        const currentVelocity = new Phaser.Math.Vector2(body.velocity.x, body.velocity.y);
 
-                currentVelocity.add(accelerationVector);
-                if (currentVelocity.length() > this.maxSpeed) {
-                    currentVelocity.setLength(this.maxSpeed);
-                }
+        if (this.cursors.up?.isDown) {
+            const angleInRadians = Phaser.Math.DegToRad(this.angle - 90);
+            const accelerationVector = new Phaser.Math.Vector2(
+                Math.cos(angleInRadians) * this.acceleration,
+                Math.sin(angleInRadians) * this.acceleration
+            );
 
-                body.setVelocity(currentVelocity.x, currentVelocity.y);
-                if (!this._afterburnerActive) {
-                    this._afterburnerActive = true;
-                    this.updateTexture();
-                }
-            } else {
-                body.setVelocity(body.velocity.x * 0.99, body.velocity.y * 0.99); // Apply some drag when not accelerating
-                if (this._afterburnerActive) {
-                    this._afterburnerActive = false;
-                    this.updateTexture();
-                }
+            currentVelocity.add(accelerationVector).limit(this.maxSpeed);
+            body.setVelocity(currentVelocity.x, currentVelocity.y);
+
+            if (!this._afterburnerActive) {
+                this._afterburnerActive = true;
+                this.updateTexture();
             }
+        } else {
+            body.setVelocity(currentVelocity.scale(0.99).x, currentVelocity.scale(0.99).y);
 
-            if (this.cursors.left?.isDown) {
-                this.angle -= 2; // Continue rotating counterclockwise
-            } else if (this.cursors.right?.isDown) {
-                this.angle += 2; // Continue rotating clockwise
+            if (this._afterburnerActive) {
+                this._afterburnerActive = false;
+                this.updateTexture();
             }
+        }
+
+        if (this.cursors.left?.isDown) {
+            this.angle -= 2;
+        } else if (this.cursors.right?.isDown) {
+            this.angle += 2;
         }
     }
 
     private wrapAroundScreen(): void {
-        if (this.body) {
-            const body = this.body as Phaser.Physics.Arcade.Body;
-            const screenWidth = this.scene.scale.width;
-            const screenHeight = this.scene.scale.height;
+        if (!this.body) return;
 
-            if (body.x < 0 - body.height) {
-                body.x = screenWidth;
-            } else if (body.x > screenWidth + body.height) {
-                body.x = 0;
-                body.x -= body.height;
-            }
+        const body = this.body as Phaser.Physics.Arcade.Body;
+        const screenWidth = this.scene.scale.width;
+        const screenHeight = this.scene.scale.height;
 
-            if (body.y < 0 - body.height) {
-                body.y = screenHeight;
-            } else if (body.y > screenHeight + body.height) {
-                body.y = 0;
-                body.y -= body.height;
-            }
+        if (body.x < -body.height) {
+            body.x = screenWidth;
+        } else if (body.x > screenWidth + body.height) {
+            body.x = -body.height;
+        }
 
-            /*if (body.y < 0) {
-                body.y = screenHeight;
-                body.y -= this.height; // Adjust position to account for ship's height
-            } else if (body.y > screenHeight) {
-                body.y = 0;
-                body.y += this.height; // Adjust position to account for ship's height
-            }*/
+        if (body.y < -body.height) {
+            body.y = screenHeight;
+        } else if (body.y > screenHeight + body.height) {
+            body.y = -body.height;
         }
     }
 }

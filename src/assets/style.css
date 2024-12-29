@@ -71,7 +71,6 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  border: fuchsia 1px solid;
 }
 
 #game-container {
@@ -80,7 +79,6 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  border: fuchsia 1px solid;
 }
 
 #score-container {

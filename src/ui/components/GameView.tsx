@@ -7,7 +7,9 @@ import { GameEventManager } from "../events/game/GameEventManager";
 import { GameEvents } from "../events/game/GameEvents";
 import { UIEventManager } from "../events/ui/UIEventManager";
 import { Background } from "./Background";
+import { Metroid } from "./Metroid";
 import { Ship } from "./Ship";
+
 export default defineComponent({
   name: 'GameView',
   setup() {
@@ -18,6 +20,7 @@ export default defineComponent({
     const uiDataManager: UIDataManager = services.dataManager;
     let background:Background;
     let ship:Ship;
+    let enemys:Metroid[] = [];
 
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
@@ -57,6 +60,15 @@ export default defineComponent({
 
         background = new Background(this, 0, 0);
         ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
+        createEnemy(this);
+
+      }
+
+      function createEnemy(scene: Phaser.Scene){
+        for(let i = 0; i < 1; i++){
+          const enemy = new Metroid(scene, Math.random() * 800, Math.random() * 600);
+          enemys.push(enemy);
+        }
       }
     });
 
