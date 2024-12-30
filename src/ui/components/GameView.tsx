@@ -6,8 +6,8 @@ import { UIDataManager } from "../data/UIDataManager";
 import { GameEventManager } from "../events/game/GameEventManager";
 import { GameEvents } from "../events/game/GameEvents";
 import { UIEventManager } from "../events/ui/UIEventManager";
+import { Astroid } from "./Astroid";
 import { Background } from "./Background";
-import { Metroid } from "./Metroid";
 import { Ship } from "./Ship";
 
 export default defineComponent({
@@ -18,9 +18,9 @@ export default defineComponent({
     const uiEventManager: UIEventManager = services.uiEventManager;
     const gameEventManager: GameEventManager = services.gameEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
-    let background:Background;
-    let ship:Ship;
-    let enemys:Metroid[] = [];
+    let background: Background;
+    let ship: Ship;
+    let enemys: Astroid[] = [];
 
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
@@ -30,8 +30,8 @@ export default defineComponent({
         physics: {
           default: 'arcade',
           arcade: {
-        gravity: { x: 0, y: 0 },
-        debug: false
+            gravity: { x: 0, y: 0 },
+            debug: false
           }
         },
         scene: {
@@ -47,9 +47,9 @@ export default defineComponent({
         /*if(background){
           background.update();
         }*/
-          if(ship){
-            ship.update();
-          }
+        if (ship) {
+          ship.update();
+        }
       }
 
       function create(this: Phaser.Scene) {
@@ -64,9 +64,26 @@ export default defineComponent({
 
       }
 
-      function createEnemy(scene: Phaser.Scene){
-        for(let i = 0; i < 1; i++){
-          const enemy = new Metroid(scene, Math.random() * 800, Math.random() * 600);
+      function createEnemy(scene: Phaser.Scene) {
+        for (let i = 0; i < 4; i++) {
+          let x = Math.random() * scene.cameras.main.width;
+          let y = Math.random() * scene.cameras.main.height;
+          const centerX = scene.cameras.main.width / 2;
+          const centerY = scene.cameras.main.height / 2;
+          const distanceFromCenter = 200; // Minimum distance from the center
+
+          if (Math.abs(x - centerX) < distanceFromCenter && Math.abs(y - centerY) < distanceFromCenter) {
+            i--; // Retry if the position is too close to the center
+            continue;
+          }
+
+          //Round to the nearest 10
+          x = Math.round(x / 10) * 10;
+          y = Math.round(y / 10) * 10;
+
+          console.log('Creating enemy at', x, y);
+
+          const enemy = new Astroid(scene, x, y, "astroid" + i);
           enemys.push(enemy);
         }
       }

@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 
-export class Metroid extends Phaser.GameObjects.Sprite {
+export class Astroid extends Phaser.GameObjects.Sprite {
 
     private speed: number;
-    private _scaleFactor = 6;
+    private _scaleFactor = 10;
+    private _id: string;
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
-        super(scene, x, y, 'ship');
+    constructor(scene: Phaser.Scene, x: number, y: number, id:string) {
+        super(scene, x, y, id);
+        this._id = id;
         //this.shipVec = new Phaser.GameObjects.Graphics(scene);
         this.scene = scene;
         this.speed = 100;
@@ -28,29 +30,32 @@ export class Metroid extends Phaser.GameObjects.Sprite {
     }
 
     protected create() {
-        const metroidVec = this.drawMetroid();
+        const metroidVec:Phaser.GameObjects.Graphics  = this.drawMetroid();
+
+        const width = 30 * this._scaleFactor;
+        const height = 30 * this._scaleFactor;
 
         // Generate a larger texture to include the entire ship
-        metroidVec.generateTexture('metroidTexture', (100 * this._scaleFactor), (100 * this._scaleFactor));
-        this.setTexture('metroidTexture');
+        metroidVec.generateTexture(this._id, width, height);
+        this.setTexture(this._id);
         //this.scene.add.existing(metroidVec);
     }
 
     protected drawMetroid(): Phaser.GameObjects.Graphics {
-        const metroidGraphics = new Phaser.GameObjects.Graphics(this.scene);
+        const astroidGraphics = new Phaser.GameObjects.Graphics(this.scene);
         const metroidPoints = this.getAsteroidPoints();
 
         // Draw the ship
-        metroidGraphics.lineStyle(2, 0xffffff);
-        metroidGraphics.beginPath();
-        metroidGraphics.moveTo(metroidPoints[0].x, metroidPoints[0].y);
+        astroidGraphics.lineStyle(2, 0xffffff);
+        astroidGraphics.beginPath();
+        astroidGraphics.moveTo(metroidPoints[0].x, metroidPoints[0].y);
         for (let i = 1; i < metroidPoints.length; i++) {
-            metroidGraphics.lineTo(metroidPoints[i].x, metroidPoints[i].y);
+            astroidGraphics.lineTo(metroidPoints[i].x, metroidPoints[i].y);
         }
-        metroidGraphics.closePath();
-        metroidGraphics.strokePath();
+        astroidGraphics.closePath();
+        astroidGraphics.strokePath();
 
-        return metroidGraphics;
+        return astroidGraphics;
     }
 
     /*protected getMetroidPoints(): { x: number, y: number }[] {
