@@ -50,6 +50,12 @@ export default defineComponent({
         if (ship) {
           ship.update();
         }
+
+        /*if (enemys) {
+          enemys.forEach((enemy) => {
+            enemy.update();
+          });
+        }*/
       }
 
       function create(this: Phaser.Scene) {
@@ -59,7 +65,8 @@ export default defineComponent({
         });
 
         background = new Background(this, 0, 0);
-        ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2);
+        ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
+
         createEnemy(this);
 
       }

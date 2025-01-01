@@ -12,6 +12,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
     private _scaleFactor = 1.5;
     private _widthOfShipTexture: number;
     private _heightOfShipTexture: number;
+    private _debug: boolean = false;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'ship');
@@ -20,10 +21,10 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this.speed = 100;
         this._widthOfShipTexture = 32;
         this._heightOfShipTexture = 32;
-        this.drawTopLeftDot();
-        this.drawCenterCross();
+        this._debug ? this.drawTopLeftDot() : null;
+        this._debug ? this.drawCenterCross() : null;
         this.create();
-        this.drawSurroundedBox();
+        this._debug ? this.drawSurroundedBox() : null;
 
         // Disable debug rendering for the ship's body
         if (this.body instanceof Phaser.Physics.Arcade.Body) {
