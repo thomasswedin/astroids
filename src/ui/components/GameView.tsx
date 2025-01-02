@@ -57,12 +57,6 @@ export default defineComponent({
             enemy.update();
           });
         }
-
-        if (bullets) {
-          bullets.children.each((bullet: Phaser.GameObjects.GameObject) => {
-            (bullet as Bullet).update();
-          });
-        }
       }
 
       function create(this: Phaser.Scene) {
@@ -112,9 +106,9 @@ export default defineComponent({
         }
       }
 
-      function handleCollision(ship: Phaser.Types.Physics.Arcade.GameObjectWithBody, astroid: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+      function handleCollision(ship: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
         console.log('Collision detected between ship and astroid');
-        
+
       }
     });
 

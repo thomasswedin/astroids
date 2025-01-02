@@ -265,7 +265,10 @@ export class Ship extends Phaser.GameObjects.Sprite {
     }
 
     private shoot(): void {
-        const bullet = new Bullet(this.scene, this.x, this.y, this.angle);
+        const angleInRadians = Phaser.Math.DegToRad(this.angle - 90);
+        const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;
+        const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
+        const bullet = new Bullet(this.scene, bulletX, bulletY, this.angle);
         this.bullets.add(bullet);
     }
 }
