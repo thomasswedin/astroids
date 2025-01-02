@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
+import { Bullet } from './Bullet';
 
 export class Ship extends Phaser.GameObjects.Sprite {
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-    private speed: number;
     // I would like to add a method to move the ship
     private acceleration: number = 10;
     private maxSpeed: number = 300;
@@ -13,12 +13,13 @@ export class Ship extends Phaser.GameObjects.Sprite {
     private _widthOfShipTexture: number;
     private _heightOfShipTexture: number;
     private _debug: boolean = false;
+    private bullets: Phaser.GameObjects.Group;
+    private lastShotTime: number | undefined;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'ship');
         //this.shipVec = new Phaser.GameObjects.Graphics(scene);
         this.scene = scene;
-        this.speed = 100;
         this._widthOfShipTexture = 32;
         this._heightOfShipTexture = 32;
         this._debug ? this.drawTopLeftDot() : null;
@@ -39,11 +40,16 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
         this.scene.physics.world.enable(this);
+        this.bullets = this.scene.add.group({
+            classType: Bullet,
+            runChildUpdate: true
+        });
     }
 
     update(): void {
         this.moveShip();
         this.wrapAroundScreen();
+        this.shootingCheck();
     }
 
     protected create() {
@@ -231,5 +237,35 @@ export class Ship extends Phaser.GameObjects.Sprite {
         } else if (body.y > screenHeight + body.height) {
             body.y = -body.height;
         }
+    }
+
+    private shootingCheck(): void {
+        if (this.scene.input.keyboard) {
+            const spaceKey = this.scene.input.keyboard.addKey('SPACE');
+
+            if (Phaser.Input.Keyboard.JustDown(spaceKey)) {
+                this.shoot();
+                this.lastShotTime = this.scene.time.now;
+            }
+
+            if (spaceKey.isDown) {
+                const currentTime = this.scene.time.now;
+                if (this.lastShotTime !== undefined && currentTime - this.lastShotTime > 700) {
+                    this.shoot();
+                    this.scene.time.addEvent({
+                        delay: 100,
+                        callback: this.shoot,
+                        callbackScope: this,
+                        repeat: 1
+                    });
+                    this.lastShotTime = currentTime;
+                }
+            }
+        }
+    }
+
+    private shoot(): void {
+        const bullet = new Bullet(this.scene, this.x, this.y, this.angle);
+        this.bullets.add(bullet);
     }
 }

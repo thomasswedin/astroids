@@ -16,7 +16,7 @@ export class Astroid extends Phaser.GameObjects.Sprite {
         this._id = id;
         //this.shipVec = new Phaser.GameObjects.Graphics(scene);
         this.scene = scene;
-        this.speed = 100;
+        this.speed = 40;
         this._thickness = 2;
         this._angle = Math.random() * Math.PI * 2;
 
@@ -44,13 +44,13 @@ export class Astroid extends Phaser.GameObjects.Sprite {
     }
 
     protected create() {
-        const metroidVec: Phaser.GameObjects.Graphics = this.drawMetroid();
+        const metroidVec: Phaser.GameObjects.Graphics = this.drawAstroid();
         metroidVec.generateTexture(this._id, this._widthOfAstroidTexture, this._heightOfAstroidTexture);
         this.setTexture(this._id);
-        //this.scene.add.existing(metroidVec);
+        metroidVec.destroy();
     }
 
-    protected drawMetroid(): Phaser.GameObjects.Graphics {
+    protected drawAstroid(): Phaser.GameObjects.Graphics {
         const astroidGraphics = new Phaser.GameObjects.Graphics(this.scene);
         const metroidPoints = this.getAsteroidPoints();
 
@@ -60,72 +60,63 @@ export class Astroid extends Phaser.GameObjects.Sprite {
         const minY = Math.min(...metroidPoints.map(p => p.y));
         const maxY = Math.max(...metroidPoints.map(p => p.y));
 
-        this._widthOfAstroidTexture = maxX - minX;
-        this._heightOfAstroidTexture = maxY - minY;
-
-        const moduloX = Math.abs((Math.abs(maxX) + minX)) / 2;
-        const moduloY = Math.abs((Math.abs(maxY) + minY)) / 2;
-
-        // Calculate the offset to center the ship
-        const offsetX = this._widthOfAstroidTexture / 2 + moduloX;
-        const offsetY = this._heightOfAstroidTexture / 2 + moduloY;
+        this._widthOfAstroidTexture = maxX - minX + this._thickness;
+        this._heightOfAstroidTexture = maxY - minY + this._thickness;
 
         // Draw the ship
         astroidGraphics.lineStyle(this._thickness, 0xffffff);
         astroidGraphics.beginPath();
-        astroidGraphics.moveTo(metroidPoints[0].x + offsetX, metroidPoints[0].y +offsetY);
+        astroidGraphics.moveTo(metroidPoints[0].x - minX, metroidPoints[0].y - minY);
         for (let i = 1; i < metroidPoints.length; i++) {
-            astroidGraphics.lineTo(metroidPoints[i].x + offsetX, metroidPoints[i].y + offsetY);
+            astroidGraphics.lineTo(metroidPoints[i].x - minX, metroidPoints[i].y - minY);
         }
         astroidGraphics.closePath();
         astroidGraphics.strokePath();
-
-        
 
         return astroidGraphics;
     }
 
     protected drawTopLeftDot(): void {
-            const topLeftGraphics = new Phaser.GameObjects.Graphics(this.scene);
-            topLeftGraphics.fillStyle(0xffffff);
-            topLeftGraphics.fillCircle(0, 0, 1);
-            topLeftGraphics.setPosition(this.x, this.y);
-            this.scene.add.existing(topLeftGraphics);
-            //set layer
-            topLeftGraphics.setDepth(1001);
-        }
-    
-    
-        protected drawCenterCross(): void {
-            const centerGraphics = new Phaser.GameObjects.Graphics(this.scene);
-            centerGraphics.lineStyle(this._thickness, 0xfb6f92);
-            centerGraphics.beginPath();
-            centerGraphics.moveTo(18 * this._scaleFactor, 20 * this._scaleFactor); // Horizontal line start
-            centerGraphics.lineTo(22 * this._scaleFactor, 20 * this._scaleFactor); // Horizontal line end
-            centerGraphics.moveTo(20 * this._scaleFactor, 18 * this._scaleFactor); // Vertical line start
-            centerGraphics.lineTo(20 * this._scaleFactor, 22 * this._scaleFactor); // Vertical line end
-            centerGraphics.strokePath();
-            centerGraphics.setPosition(this.x - 20 * this._scaleFactor, this.y - 20 * this._scaleFactor); // Position it at the same coordinates as the ship
-            this.scene.add.existing(centerGraphics);
-            centerGraphics.setDepth(1000);
-        }
-    
-        protected drawSurroundedBox(): void {
-            const boxWidth = this.width;
-            const boxHeight = this.height;
-            const surroundedBoxGraphic = new Phaser.GameObjects.Graphics(this.scene);
-            surroundedBoxGraphic.lineStyle(this._thickness, 0xff00ff);
-            surroundedBoxGraphic.beginPath();
-            surroundedBoxGraphic.moveTo(0, 0);
-            surroundedBoxGraphic.lineTo(boxWidth, 0);
-            surroundedBoxGraphic.lineTo(boxWidth, boxHeight);
-            surroundedBoxGraphic.lineTo(0, boxHeight);
-            surroundedBoxGraphic.closePath();
-            surroundedBoxGraphic.strokePath();
-    
-            surroundedBoxGraphic.setPosition(this.x - boxWidth / 2, this.y - boxHeight / 2); // Center the box around the ship
-            this.scene.add.existing(surroundedBoxGraphic);
-        }
+        const topLeftGraphics = new Phaser.GameObjects.Graphics(this.scene);
+        topLeftGraphics.fillStyle(0xffffff);
+        topLeftGraphics.fillCircle(0, 0, 1);
+        topLeftGraphics.setPosition(this.x, this.y);
+        this.scene.add.existing(topLeftGraphics);
+        //set layer
+        topLeftGraphics.setDepth(1001);
+    }
+
+
+    protected drawCenterCross(): void {
+        const centerGraphics = new Phaser.GameObjects.Graphics(this.scene);
+        centerGraphics.lineStyle(this._thickness, 0xfb6f92);
+        centerGraphics.beginPath();
+        centerGraphics.moveTo(18 * this._scaleFactor, 20 * this._scaleFactor); // Horizontal line start
+        centerGraphics.lineTo(22 * this._scaleFactor, 20 * this._scaleFactor); // Horizontal line end
+        centerGraphics.moveTo(20 * this._scaleFactor, 18 * this._scaleFactor); // Vertical line start
+        centerGraphics.lineTo(20 * this._scaleFactor, 22 * this._scaleFactor); // Vertical line end
+        centerGraphics.strokePath();
+        centerGraphics.setPosition(this.x - 20 * this._scaleFactor, this.y - 20 * this._scaleFactor); // Position it at the same coordinates as the ship
+        this.scene.add.existing(centerGraphics);
+        centerGraphics.setDepth(1000);
+    }
+
+    protected drawSurroundedBox(): void {
+        const boxWidth = this.width;
+        const boxHeight = this.height;
+        const surroundedBoxGraphic = new Phaser.GameObjects.Graphics(this.scene);
+        surroundedBoxGraphic.lineStyle(this._thickness, 0xff00ff);
+        surroundedBoxGraphic.beginPath();
+        surroundedBoxGraphic.moveTo(0, 0);
+        surroundedBoxGraphic.lineTo(boxWidth, 0);
+        surroundedBoxGraphic.lineTo(boxWidth, boxHeight);
+        surroundedBoxGraphic.lineTo(0, boxHeight);
+        surroundedBoxGraphic.closePath();
+        surroundedBoxGraphic.strokePath();
+
+        surroundedBoxGraphic.setPosition(this.x - boxWidth / 2, this.y - boxHeight / 2); // Center the box around the ship
+        this.scene.add.existing(surroundedBoxGraphic);
+    }
 
     protected getAsteroidPoints(): { x: number, y: number }[] {
         const numPoints = 12; // Number of points for the asteroid
@@ -150,7 +141,7 @@ export class Astroid extends Phaser.GameObjects.Sprite {
     protected moveAstroid(): void {
         if (!this.body) return;
         //Move the astroid in a random direction
-        
+
         const x = Math.cos(this._angle) * this.speed;
         const y = Math.sin(this._angle) * this.speed;
         (this.body as Phaser.Physics.Arcade.Body).setVelocity(x, y);
@@ -165,13 +156,13 @@ export class Astroid extends Phaser.GameObjects.Sprite {
 
         if (body.x < -body.height) {
             body.x = screenWidth;
-        } else if (body.x > screenWidth + (body.height/2)) {
+        } else if (body.x > screenWidth + (body.height / 2)) {
             body.x = -body.height;
         }
 
         if (body.y < -body.height) {
             body.y = screenHeight;
-        } else if (body.y > screenHeight + (body.height/2)) {
+        } else if (body.y > screenHeight + (body.height / 2)) {
             body.y = -body.height;
         }
     }

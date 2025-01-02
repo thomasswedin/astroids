@@ -8,6 +8,7 @@ import { GameEvents } from "../events/game/GameEvents";
 import { UIEventManager } from "../events/ui/UIEventManager";
 import { Astroid } from "./Astroid";
 import { Background } from "./Background";
+import { Bullet } from './Bullet';
 import { Ship } from "./Ship";
 
 export default defineComponent({
@@ -18,9 +19,9 @@ export default defineComponent({
     const uiEventManager: UIEventManager = services.uiEventManager;
     const gameEventManager: GameEventManager = services.gameEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
-    let background: Background;
     let ship: Ship;
     let enemys: Astroid[] = [];
+    let bullets: Phaser.GameObjects.Group;
 
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
@@ -51,11 +52,17 @@ export default defineComponent({
           ship.update();
         }
 
-        /*if (enemys) {
+        if (enemys) {
           enemys.forEach((enemy) => {
             enemy.update();
           });
-        }*/
+        }
+
+        if (bullets) {
+          bullets.children.each((bullet: Phaser.GameObjects.GameObject) => {
+            (bullet as Bullet).update();
+          });
+        }
       }
 
       function create(this: Phaser.Scene) {
@@ -64,10 +71,20 @@ export default defineComponent({
           gameEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
         });
 
-        background = new Background(this, 0, 0);
+        new Background(this, 0, 0);
         ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
 
         createEnemy(this);
+
+        bullets = this.add.group({
+          classType: Bullet,
+          runChildUpdate: true
+        });
+
+        // Add collision detection between ship and astroids
+        enemys.forEach((enemy) => {
+          this.physics.add.collider(ship, enemy, handleCollision, undefined, this);
+        });
 
       }
 
@@ -93,6 +110,11 @@ export default defineComponent({
           const enemy = new Astroid(scene, x, y, "astroid" + i);
           enemys.push(enemy);
         }
+      }
+
+      function handleCollision(ship: Phaser.Types.Physics.Arcade.GameObjectWithBody, astroid: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+        console.log('Collision detected between ship and astroid');
+        
       }
     });
 
