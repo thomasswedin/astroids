@@ -105,6 +105,7 @@ export default defineComponent({
           y = Math.round(y / 10) * 10;
 
           const enemy = new Astroid(scene, x, y, "astroid" + i);
+          enemy.sizeType = 3;
           enemies.add(enemy);
         }
       }
@@ -114,11 +115,42 @@ export default defineComponent({
         //ship.destroy();
       }
 
-      function handleBulletHitEnemy(bullet: Phaser.GameObjects.Sprite, enemy: Phaser.GameObjects.Sprite) {
+      function handleBulletHitEnemy(this: Phaser.Scene, bullet: Phaser.GameObjects.Sprite, enemy: Phaser.GameObjects.Sprite) {
         console.log('Bullet hit enemy!');
-
-        bullet.destroy(); // Destroy the bullet
+        const sizeType = (enemy as Astroid).sizeType;
+        const position = new Phaser.Math.Vector2(enemy.x, enemy.y);
+        const astroidID = (enemy as Astroid).id;
+        //Destroy all bullets
+        bullet.destroy();
         enemy.destroy();  // Destroy the enemy
+
+        //Destroy all bullets
+        bullets.destroy(true);
+
+        //Depending on the sizeType of the enemy, create smaller enemies
+        //If the sizeType is 1, don't create smaller enemies
+        if (sizeType > 1) {
+          createSmallerEnemies.call(this, sizeType, position, astroidID);
+        }
+
+        function createSmallerEnemies(this: Phaser.Scene, sizeType: number, position: Phaser.Math.Vector2, parentID: string) {
+          const newSizeType = sizeType - 1;
+          const newEnemies = 3; // Create 2 new enemies
+
+          //Based on astroID that comes from parent, create new enemies with new ID based on the parent ID
+          //Example: If parent ID is astroid1, then the new enemies will be astroid1-1, astroid1-2, astroid1-3
+
+          //Create new enemies
+          for (let i = 0; i < newEnemies; i++) {
+            const newAstroid = new Astroid(this, position.x, position.y, parentID + "-" + i);
+            newAstroid.sizeType = newSizeType;
+            enemies.add(newAstroid);
+          }
+        }
+
+
+        //
+
         // Add custom logic here, like updating score
         score.value += 10; // Example: Increase score by 10
       }

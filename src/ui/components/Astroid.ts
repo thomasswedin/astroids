@@ -10,6 +10,7 @@ export class Astroid extends Phaser.GameObjects.Sprite {
     private _heightOfAstroidTexture: number;
     private _debug: boolean = false;
     private _thickness: number;
+    private _sizeType: number = 0;
 
     constructor(scene: Phaser.Scene, x: number, y: number, id: string) {
         super(scene, x, y, id);
@@ -39,9 +40,27 @@ export class Astroid extends Phaser.GameObjects.Sprite {
         this.body = this.body as Phaser.Physics.Arcade.Body;
     }
 
+    
+
     update(): void {
         this.moveAstroid();
         this.wrapAroundScreen();
+    }
+
+    get sizeType(): number {
+        return this._sizeType;
+    }
+
+    set sizeType(sizeType: number) {
+        this._sizeType = sizeType;
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    set id(id: string) {
+        this._id = id;
     }
 
     protected create() {
