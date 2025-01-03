@@ -13,7 +13,6 @@ export class Ship extends Phaser.GameObjects.Sprite {
     private _widthOfShipTexture: number;
     private _heightOfShipTexture: number;
     private _debug: boolean = false;
-    private bullets: Phaser.GameObjects.Group;
     private lastShotTime: number | undefined;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -240,6 +239,10 @@ export class Ship extends Phaser.GameObjects.Sprite {
     }
 
     private shootingCheck(): void {
+        if(!this.scene){
+            return;
+        }
+
         if (this.scene.input.keyboard) {
             const spaceKey = this.scene.input.keyboard.addKey('SPACE');
 
@@ -269,6 +272,6 @@ export class Ship extends Phaser.GameObjects.Sprite {
         const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;
         const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
         const bullet = new Bullet(this.scene, bulletX, bulletY, this.angle);
-        this.bullets.add(bullet);
+        this.scene.events.emit('shoot', bullet);
     }
 }

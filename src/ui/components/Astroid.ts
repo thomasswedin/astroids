@@ -16,7 +16,7 @@ export class Astroid extends Phaser.GameObjects.Sprite {
         this._id = id;
         //this.shipVec = new Phaser.GameObjects.Graphics(scene);
         this.scene = scene;
-        this.speed = 40;
+        this.speed = 80;
         this._thickness = 2;
         this._angle = Math.random() * Math.PI * 2;
 
@@ -35,7 +35,8 @@ export class Astroid extends Phaser.GameObjects.Sprite {
 
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
-        this.scene.physics.world.enable(this);
+        this.scene.physics.world.enableBody(this, Phaser.Physics.Arcade.DYNAMIC_BODY);
+        this.body = this.body as Phaser.Physics.Arcade.Body;
     }
 
     update(): void {
@@ -148,26 +149,20 @@ export class Astroid extends Phaser.GameObjects.Sprite {
     }
 
     private wrapAroundScreen(): void {
-        if (!this.body) return;
+        // Smooth wrap around the screen considering the width and height of the asteroid
+        const bufferX = this.width / 2;
+        const bufferY = this.height / 2;
 
-        const body = this.body as Phaser.Physics.Arcade.Body;
-        const screenWidth = this.scene.scale.width;
-        const screenHeight = this.scene.scale.height;
-
-        if (body.x < -body.height) {
-            body.x = screenWidth;
-        } else if (body.x > screenWidth + (body.height / 2)) {
-            body.x = -body.height;
+        if (this.x < -bufferX) {
+            this.x = this.scene.scale.width + bufferX;
+        } else if (this.x > this.scene.scale.width + bufferX) {
+            this.x = -bufferX;
         }
 
-        if (body.y < -body.height) {
-            body.y = screenHeight;
-        } else if (body.y > screenHeight + (body.height / 2)) {
-            body.y = -body.height;
+        if (this.y < -bufferY) {
+            this.y = this.scene.scale.height + bufferY;
+        } else if (this.y > this.scene.scale.height + bufferY) {
+            this.y = -bufferY;
         }
     }
-
-
-
-
 }

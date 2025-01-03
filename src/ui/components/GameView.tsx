@@ -20,7 +20,7 @@ export default defineComponent({
     const gameEventManager: GameEventManager = services.gameEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
     let ship: Ship;
-    let enemys: Astroid[] = [];
+    let enemies: Phaser.GameObjects.Group;
     let bullets: Phaser.GameObjects.Group;
 
     onMounted(() => {
@@ -52,11 +52,6 @@ export default defineComponent({
           ship.update();
         }
 
-        if (enemys) {
-          enemys.forEach((enemy) => {
-            enemy.update();
-          });
-        }
       }
 
       function create(this: Phaser.Scene) {
@@ -65,20 +60,30 @@ export default defineComponent({
           gameEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
         });
 
+        this.events.on('shoot', (bullet: Bullet) => {
+          bullets.add(bullet);
+        });
+
         new Background(this, 0, 0);
         ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
-
-        createEnemy(this);
 
         bullets = this.add.group({
           classType: Bullet,
           runChildUpdate: true
         });
 
-        // Add collision detection between ship and astroids
-        enemys.forEach((enemy) => {
-          this.physics.add.collider(ship, enemy, handleCollision, undefined, this);
+        enemies = this.add.group({
+          classType: Astroid,
+          runChildUpdate: true,
         });
+
+        createEnemy(this);
+
+        // Add collision detection between ship and astroids
+        this.physics.add.collider(ship, enemies, handleCollision, undefined, this);
+
+        // Add collider between bullets and enemies with a callback function
+        this.physics.add.collider(bullets, enemies, handleBulletHitEnemy, undefined, this);
 
       }
 
@@ -99,16 +104,23 @@ export default defineComponent({
           x = Math.round(x / 10) * 10;
           y = Math.round(y / 10) * 10;
 
-          console.log('Creating enemy at', x, y);
-
           const enemy = new Astroid(scene, x, y, "astroid" + i);
-          enemys.push(enemy);
+          enemies.add(enemy);
         }
       }
 
       function handleCollision(ship: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
         console.log('Collision detected between ship and astroid');
+        //ship.destroy();
+      }
 
+      function handleBulletHitEnemy(bullet: Phaser.GameObjects.Sprite, enemy: Phaser.GameObjects.Sprite) {
+        console.log('Bullet hit enemy!');
+
+        bullet.destroy(); // Destroy the bullet
+        enemy.destroy();  // Destroy the enemy
+        // Add custom logic here, like updating score
+        score.value += 10; // Example: Increase score by 10
       }
     });
 
