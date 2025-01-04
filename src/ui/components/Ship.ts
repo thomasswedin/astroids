@@ -39,10 +39,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
         this.scene.physics.world.enable(this);
-        this.bullets = this.scene.add.group({
-            classType: Bullet,
-            runChildUpdate: true
-        });
+        
     }
 
     update(): void {
