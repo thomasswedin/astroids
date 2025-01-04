@@ -12,10 +12,11 @@ export class Astroid extends Phaser.GameObjects.Sprite {
     private _thickness: number;
     private _sizeType: number = 0;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, id: string) {
+    constructor(scene: Phaser.Scene, x: number, y: number, id: string, sizeType: number) {
         super(scene, x, y, id);
         this._id = id;
-        //this.shipVec = new Phaser.GameObjects.Graphics(scene);
+        this._sizeType = sizeType
+        this._scaleFactor = Math.pow(2, sizeType);
         this.scene = scene;
         this.speed = 80;
         this._thickness = 2;
@@ -49,10 +50,6 @@ export class Astroid extends Phaser.GameObjects.Sprite {
 
     get sizeType(): number {
         return this._sizeType;
-    }
-
-    set sizeType(sizeType: number) {
-        this._sizeType = sizeType;
     }
 
     get id(): string {

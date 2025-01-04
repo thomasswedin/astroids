@@ -1,0 +1,123 @@
+//create a class that extends Phaser.GameObjects.Sprite
+// this class will represent the explosion effect when the ship collides with an astroid
+// the explosion effect will be a sprite sheet animation
+// the explosion effect will be created when the ship collides with an astroid
+import Phaser from 'phaser';
+
+export class Explosion extends Phaser.GameObjects.Sprite {
+
+    private _scaleFactor = 1.5;
+    private _debug: boolean = false;
+    private _angle: number;
+    private _speed: number ;
+    private _shipVecContainer: Phaser.GameObjects.Container | null = null;
+
+    constructor(scene: Phaser.Scene, x: number, y: number, angle: number, id: string = 'explosion') {
+        super(scene, x, y, id);
+        this.scene = scene;
+        this._speed = 80;
+        this._angle = angle;
+        this._shipVecContainer = new Phaser.GameObjects.Container(this.scene);
+        this._shipVecContainer = this.drawShipPices();
+
+
+
+        this._debug ? this.drawSurroundedBox() : null;
+
+        //set the position of the explosion to the position of the ship
+        //this.setPosition(x, y);
+        //this.scene.add.existing(this);
+        //this.scene.physics.add.existing(this);
+        //this.scene.physics.world.enable(this);
+        //this._angle = angle;
+        //this.setAngle(angle);
+
+
+    }
+
+    update(): void {
+        /*if (this._shipVecContainer && this._shipVecContainer.list && this._shipVecContainer.list.length > 0) {
+            this._shipVecContainer.each((child: Phaser.GameObjects.GameObject) => {
+                if (child instanceof Phaser.GameObjects.Graphics) {
+                    this.scene.physics.add.existing(child);
+                    const body = child.body as Phaser.Physics.Arcade.Body;
+                    const x = Math.cos(this._angle) * this._speed;
+                    const y = Math.sin(this._angle) * this._speed;
+                    body.setVelocity(x, y);
+                }
+            });
+        }*/
+    }
+
+
+
+    protected drawShipPices(): Phaser.GameObjects.Container {
+
+        let _shipVecContainer: Phaser.GameObjects.Container = new Phaser.GameObjects.Container(this.scene);
+
+
+        const shipPoints = [
+            { x: 0, y: -20 },
+            { x: 10, y: 10 },
+            { x: 5, y: 3 },
+            { x: -5, y: 3 },
+            { x: -10, y: 10 },
+            { x: 0, y: -20 }
+        ].map(point => ({
+            x: point.x * this._scaleFactor,
+            y: point.y * this._scaleFactor
+        }));
+
+
+        //shipGraphics.moveTo(shipPoints[0].x, shipPoints[0].y);
+        for (let i = 1; i < shipPoints.length; i++) {
+            const shipGraphics = new Phaser.GameObjects.Graphics(this.scene);
+            shipGraphics.lineStyle(2, 0xffffff);
+            shipGraphics.beginPath();
+            shipGraphics.moveTo(shipPoints[i - 1].x, shipPoints[i - 1].y);
+            shipGraphics.lineStyle(2, 0xffffff);
+            shipGraphics.lineTo(shipPoints[i].x, shipPoints[i].y);
+            shipGraphics.closePath();
+            shipGraphics.strokePath();
+            shipGraphics.setPosition(this.x, this.y);
+            shipGraphics.setAngle(this._angle);
+            this.scene.add.existing(shipGraphics);
+            this.scene.physics.add.existing(shipGraphics);
+            this.scene.physics.world.enable(shipGraphics);
+
+
+            // Animate the graphics in random directions
+        this.scene.tweens.add({
+            targets: shipGraphics,
+            x: this.x + Phaser.Math.Between(-100, 100),
+            y: this.y + Phaser.Math.Between(-100, 100),
+            alpha: 0, // Fade out
+            duration: Phaser.Math.Between(700, 2000),
+            ease: 'Power2',
+            onComplete: () => {
+            shipGraphics.destroy(); // Optional: destroy the graphics after animation
+            }
+        });
+
+        }
+        //this.scene.add.existing(_shipVecContainer);
+        return _shipVecContainer;
+    }
+
+    protected drawSurroundedBox(): void {
+        const boxWidth = this.width;
+        const boxHeight = this.height;
+        const surroundedBoxGraphic = new Phaser.GameObjects.Graphics(this.scene);
+        surroundedBoxGraphic.lineStyle(1, 0xff00ff);
+        surroundedBoxGraphic.beginPath();
+        surroundedBoxGraphic.moveTo(0, 0);
+        surroundedBoxGraphic.lineTo(boxWidth, 0);
+        surroundedBoxGraphic.lineTo(boxWidth, boxHeight);
+        surroundedBoxGraphic.lineTo(0, boxHeight);
+        surroundedBoxGraphic.closePath();
+        surroundedBoxGraphic.strokePath();
+
+        surroundedBoxGraphic.setPosition(this.x - boxWidth / 2, this.y - boxHeight / 2); // Center the box around the ship
+        this.scene.add.existing(surroundedBoxGraphic);
+    }
+}

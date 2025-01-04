@@ -9,6 +9,7 @@ import { UIEventManager } from "../events/ui/UIEventManager";
 import { Astroid } from "./Astroid";
 import { Background } from "./Background";
 import { Bullet } from './Bullet';
+import { Explosion } from './Explosion';
 import { Ship } from "./Ship";
 
 export default defineComponent({
@@ -20,6 +21,7 @@ export default defineComponent({
     const gameEventManager: GameEventManager = services.gameEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
     let ship: Ship;
+    let explosion: Explosion;
     let enemies: Phaser.GameObjects.Group;
     let bullets: Phaser.GameObjects.Group;
 
@@ -51,7 +53,6 @@ export default defineComponent({
         if (ship) {
           ship.update();
         }
-
       }
 
       function create(this: Phaser.Scene) {
@@ -104,66 +105,67 @@ export default defineComponent({
           x = Math.round(x / 10) * 10;
           y = Math.round(y / 10) * 10;
 
-          const enemy = new Astroid(scene, x, y, "astroid" + i);
-          enemy.sizeType = 3;
+          const enemy = new Astroid(scene, x, y, "astroid" + i, 3);
           enemies.add(enemy);
         }
       }
 
-      function handleCollision(ship: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
+      function handleCollision(this: Phaser.Scene, ship: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
         console.log('Collision detected between ship and astroid');
-        //ship.destroy();
+        const position = new Phaser.Math.Vector2(ship.x, ship.y);
+        const angle = ship.angle;
+        ship.destroy();
+
+        explosion = new Explosion(this, position.x, position.y, angle);
+        handleAstroidHitEnemy.call(this, astroid);
       }
 
-      function handleBulletHitEnemy(this: Phaser.Scene, bullet: Phaser.GameObjects.Sprite, enemy: Phaser.GameObjects.Sprite) {
-        console.log('Bullet hit enemy!');
-        const sizeType = (enemy as Astroid).sizeType;
-        const position = new Phaser.Math.Vector2(enemy.x, enemy.y);
-        const astroidID = (enemy as Astroid).id;
-        //Destroy all bullets
+      function handleBulletHitEnemy(this: Phaser.Scene, bullet: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
+        handleAstroidHitEnemy.call(this, astroid);
         bullet.destroy();
-        enemy.destroy();  // Destroy the enemy
+      }
+
+      function handleAstroidHitEnemy(this: Phaser.Scene, astroid: Phaser.GameObjects.Sprite) {
+        const sizeType = (astroid as Astroid).sizeType;
+        const position = new Phaser.Math.Vector2(astroid.x, astroid.y);
+        const astroidID = (astroid as Astroid).id;
+        
+        astroid.destroy();  // Destroy the enemy
 
         //Destroy all bullets
-        bullets.destroy(true);
+        //bullets.destroy(true);
 
         //Depending on the sizeType of the enemy, create smaller enemies
         //If the sizeType is 1, don't create smaller enemies
         if (sizeType > 1) {
           createSmallerEnemies.call(this, sizeType, position, astroidID);
         }
-
-        function createSmallerEnemies(this: Phaser.Scene, sizeType: number, position: Phaser.Math.Vector2, parentID: string) {
-          const newSizeType = sizeType - 1;
-          const newEnemies = 3; // Create 2 new enemies
-
-          //Based on astroID that comes from parent, create new enemies with new ID based on the parent ID
-          //Example: If parent ID is astroid1, then the new enemies will be astroid1-1, astroid1-2, astroid1-3
-
-          //Create new enemies
-          for (let i = 0; i < newEnemies; i++) {
-            const newAstroid = new Astroid(this, position.x, position.y, parentID + "-" + i);
-            newAstroid.sizeType = newSizeType;
-            enemies.add(newAstroid);
-          }
-        }
-
-
-        //
-
-        // Add custom logic here, like updating score
-        score.value += 10; // Example: Increase score by 10
       }
+
+      function createSmallerEnemies(this: Phaser.Scene, sizeType: number, position: Phaser.Math.Vector2, parentID: string) {
+        const newSizeType = sizeType - 1;
+        const newEnemies = 2; // Create 2 new enemies
+
+        //Based on astroID that comes from parent, create new enemies with new ID based on the parent ID
+        //Example: If parent ID is astroid1, then the new enemies will be astroid1-1, astroid1-2, astroid1-3
+
+        //Create new enemies
+        for (let i = 0; i < newEnemies; i++) {
+          const newAstroid = new Astroid(this, position.x, position.y, parentID + "-" + i, newSizeType);
+          enemies.add(newAstroid);
+        }
+      }
+      
     });
 
-    watch(uiDataManager.gameScore.score.ref, (newValue) => {
-      score.value = newValue;
-    });
+      watch(uiDataManager.gameScore.score.ref, (newValue) => {
+        score.value = newValue;
+      });
 
-    return () => (
-      <div>
-        <div id='score-container'>Score: {score.value}</div>
-      </div>
-    );
-  },
+      return () => (
+        <div>
+          <div id='score-container'>Score: {score.value}</div>
+        </div>
+      );
+    },
 });
