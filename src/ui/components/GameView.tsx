@@ -10,7 +10,6 @@ import { Astroid } from "./Astroid";
 import { Background } from "./Background";
 import { Bullet } from './Bullet';
 import { Explosion } from './Explosion';
-import { LivesPanel } from './LivesPanel';
 import { Ship } from "./Ship";
 
 export default defineComponent({
@@ -67,7 +66,7 @@ export default defineComponent({
         });
 
         new Background(this, 0, 0);
-        new LivesPanel(this, this.cameras.main.width - 100, 0, 'lives');
+        //new LivesPanel(this, this.cameras.main.width - 100, 0, 'lives');
 
         ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
 
@@ -84,10 +83,21 @@ export default defineComponent({
         createEnemy(this);
 
         // Add collision detection between ship and astroids
-        this.physics.add.collider(ship, enemies, handleCollision, undefined, this);
+        this.physics.add.collider(ship, enemies, function (this: Phaser.Scene, ship, astroid) {
+          console.log('Collision detected between ship and astroid');
+          const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
+          const angle = (ship as Phaser.GameObjects.Sprite).angle;
+          ship.destroy();
+
+          explosion = new Explosion(this, position.x, position.y, angle);
+          handleAstroidHitEnemy.call(this, astroid as Phaser.GameObjects.Sprite);
+        }, undefined, this);
 
         // Add collider between bullets and enemies with a callback function
-        this.physics.add.collider(bullets, enemies, handleBulletHitEnemy, undefined, this);
+        this.physics.add.collider(bullets, enemies, function (this: Phaser.Scene, bullet, astroid) {
+          handleAstroidHitEnemy.call(this, astroid as Phaser.GameObjects.Sprite);
+          bullet.destroy();
+        }, undefined, this);
 
       }
 
@@ -113,20 +123,9 @@ export default defineComponent({
         }
       }
 
-      function handleCollision(this: Phaser.Scene, ship: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
-        console.log('Collision detected between ship and astroid');
-        const position = new Phaser.Math.Vector2(ship.x, ship.y);
-        const angle = ship.angle;
-        ship.destroy();
 
-        explosion = new Explosion(this, position.x, position.y, angle);
-        handleAstroidHitEnemy.call(this, astroid);
-      }
 
-      function handleBulletHitEnemy(this: Phaser.Scene, bullet: Phaser.GameObjects.Sprite, astroid: Phaser.GameObjects.Sprite) {
-        handleAstroidHitEnemy.call(this, astroid);
-        bullet.destroy();
-      }
+
 
       function handleAstroidHitEnemy(this: Phaser.Scene, astroid: Phaser.GameObjects.Sprite) {
         const sizeType = (astroid as Astroid).sizeType;
