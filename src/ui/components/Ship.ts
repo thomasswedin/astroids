@@ -9,7 +9,7 @@ export class Ship extends ShipMain {
     private acceleration: number = 10;
     private maxSpeed: number = 300;
     private _afterburnerActive: boolean = false;
-    private _scaleFactor: number = 1.5;
+    protected _scaleFactor: number = 1.5;
     
     private lastShotTime: number | undefined;
 

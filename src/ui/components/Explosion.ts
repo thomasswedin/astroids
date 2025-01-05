@@ -9,17 +9,12 @@ export class Explosion extends Phaser.GameObjects.Sprite {
     private _scaleFactor = 1.5;
     private _debug: boolean = false;
     private _angle: number;
-    private _speed: number ;
-    private _shipVecContainer: Phaser.GameObjects.Container | null = null;
 
     constructor(scene: Phaser.Scene, x: number, y: number, angle: number, id: string = 'explosion') {
         super(scene, x, y, id);
         this.scene = scene;
-        this._speed = 80;
         this._angle = angle;
-        this._shipVecContainer = new Phaser.GameObjects.Container(this.scene);
-        this._shipVecContainer = this.drawShipPices();
-
+        new Phaser.GameObjects.Container(this.scene);
 
 
         this._debug ? this.drawSurroundedBox() : null;
