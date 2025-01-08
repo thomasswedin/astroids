@@ -2,7 +2,9 @@ import { UIPropertyRef } from "./UIPropertyRef";
 
 export class UIDataManager {
 
-    public gameScore = {
+    public game = {
         score: new UIPropertyRef(0),
+        lives: new UIPropertyRef(0),
+        level: new UIPropertyRef(0),
     };
 }

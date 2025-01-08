@@ -9,5 +9,6 @@ export interface IHitData {
 }
 
 export const GameEvents = {
+    GameSetupComplete: {},
     HitEvent: {data: <IHitData>{}},
 };

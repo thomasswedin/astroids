@@ -1,27 +1,38 @@
 import Phaser from 'phaser';
-import { LivesPaneShip } from './LivesPaneShip';
+import { LivesPanelShip } from './LivesPanelShip';
 
 export class LivesPanel extends Phaser.GameObjects.Graphics {
 
     protected _scoreLabel!: Phaser.GameObjects.Text;
+    protected _livesGroup!: Phaser.GameObjects.Group;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, { x, y });
         this.createScoreLabel();
-        this.drawPanel();
     }
 
     public setScore(value: Number) {
         this._scoreLabel.text = value.toString();
     }
 
-    protected drawPanel() {
-        for (let i = 0; i < 2; i++) {
-            const ship: Phaser.GameObjects.Sprite = new LivesPaneShip(this.scene, (i + 1) * 20, 40, "life" + i);
-            this.scene.add.existing(ship);
+    public setLives(lives: number) {
+        this.drawLives(lives);
+    }
 
-            this.scene.physics.add.existing(this);
-            this.scene.physics.world.enable(this);
+    protected drawLives(lives: number) {
+
+        if (this._livesGroup) {
+            //Remove all children in this._livesGroup and from scene
+            this._livesGroup.clear(true, true);
+        } else {
+            this._livesGroup = this.scene.add.group();
+        }
+
+        // Add the lives sprites to the group
+        for (let i = 0; i < lives; i++) {
+            const ship: Phaser.GameObjects.Sprite = new LivesPanelShip(this.scene, (i + 1) * 20, 40, "life" + i);
+            this._livesGroup.add(ship);
+            this.scene.add.existing(ship); // Add each ship to the scene
         }
     }
 
@@ -37,7 +48,7 @@ export class LivesPanel extends Phaser.GameObjects.Graphics {
                 //x: 32,    // 32px padding on the left/right
                 //y: 16     // 16px padding on the top/bottom
             },
-            text: '00000',
+            text: '',
             style: {
                 fontSize: '22px',
                 fontFamily: 'Arial',

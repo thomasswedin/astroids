@@ -17,6 +17,8 @@ export default defineComponent({
   name: 'GameView',
   setup() {
     const score = ref(0);
+    const lives = ref(0);
+
     const services: IUIServices = inject(servicesKey) as IUIServices;
     const uiEventManager: UIEventManager = services.uiEventManager;
     const gameEventManager: GameEventManager = services.gameEventManager;
@@ -101,6 +103,8 @@ export default defineComponent({
           bullet.destroy();
         }, undefined, this);
 
+        uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
+
       }
 
       function createEnemy(scene: Phaser.Scene) {
@@ -149,9 +153,14 @@ export default defineComponent({
 
     });
 
-    watch(uiDataManager.gameScore.score.ref, (newValue) => {
+    watch(uiDataManager.game.score.ref, (newValue) => {
       score.value = newValue;
       livesPanel.setScore(newValue);
+    });
+
+    watch(uiDataManager.game.lives.ref, (newValue) => {
+      lives.value = newValue;
+      livesPanel.setLives(newValue);
     });
 
     return () => (

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export class LivesPaneShip extends Phaser.GameObjects.Sprite {
+export class LivesPanelShip extends Phaser.GameObjects.Sprite {
     protected _scaleFactor: number = 0.8;
     protected shipTextureKey: string = "livesPanelShipTexture";
     private _widthOfShipTexture: number;

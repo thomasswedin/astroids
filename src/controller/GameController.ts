@@ -35,12 +35,22 @@ export class GameController {
     this.addEventListeners();
   }
 
-  protected onHitEvent(evt: any): void {
-    this.model.incrementScore(evt.enemy);
-    this.getGameUIDataManager().gameScore.score.value = this.model.getScore();
-  }
-
   protected addEventListeners(): void {
+    this.getGameEventManager().addEventListener(GameEvents.GameSetupComplete, this.onGameSetupComplete, this);
     this.getGameEventManager().addEventListener(GameEvents.HitEvent, this.onHitEvent, this);
   }
+
+  protected onGameSetupComplete(): void {
+    this.getGameUIDataManager().game.score.value = this.model.getScore();
+    this.getGameUIDataManager().game.lives.value = 3;
+    this.getGameUIDataManager().game.level.value = 1;
+  }
+
+  protected onHitEvent(evt: any): void {
+    this.model.incrementScore(evt.enemy);
+    this.getGameUIDataManager().game.score.value = this.model.getScore();
+    this.getGameUIDataManager().game.lives.value = 2;
+  }
+
+  
 }
