@@ -4,12 +4,13 @@ import type { IUIServices } from '../../UIController';
 import { servicesKey } from '../../UIController';
 import { UIDataManager } from "../data/UIDataManager";
 import { GameEventManager } from "../events/game/GameEventManager";
-import { GameEvents } from "../events/game/GameEvents";
+import { GameEvents } from '../events/game/GameEvents';
 import { UIEventManager } from "../events/ui/UIEventManager";
 import { Astroid } from "./Astroid";
 import { Background } from "./Background";
 import { Bullet } from './Bullet';
 import { Explosion } from './Explosion';
+import { LivesPanel } from './LivesPanel';
 import { Ship } from "./Ship";
 
 export default defineComponent({
@@ -24,6 +25,7 @@ export default defineComponent({
     let explosion: Explosion;
     let enemies: Phaser.GameObjects.Group;
     let bullets: Phaser.GameObjects.Group;
+    let livesPanel: LivesPanel;
 
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
@@ -56,17 +58,17 @@ export default defineComponent({
       }
 
       function create(this: Phaser.Scene) {
-        this.input.on('pointerdown', () => {
+        /*this.input.on('pointerdown', () => {
           uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
           gameEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
-        });
-
+        });*/
+ 
         this.events.on('shoot', (bullet: Bullet) => {
           bullets.add(bullet);
         });
 
         new Background(this, 0, 0);
-        //new LivesPanel(this, this.cameras.main.width - 100, 0, 'lives');
+        livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0, 'lives');
 
         ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
 
@@ -123,14 +125,12 @@ export default defineComponent({
         }
       }
 
-
-
-
-
       function handleAstroidHitEnemy(this: Phaser.Scene, astroid: Phaser.GameObjects.Sprite) {
         const sizeType = (astroid as Astroid).sizeType;
         const position = new Phaser.Math.Vector2(astroid.x, astroid.y);
         const astroidID = (astroid as Astroid).id;
+
+        uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: sizeType });
 
         astroid.destroy();  // Destroy the enemy
         if (sizeType > 1) {
@@ -151,6 +151,7 @@ export default defineComponent({
 
     watch(uiDataManager.gameScore.score.ref, (newValue) => {
       score.value = newValue;
+      livesPanel.setScore(newValue);
     });
 
     return () => (
