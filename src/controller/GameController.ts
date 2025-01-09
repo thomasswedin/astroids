@@ -49,7 +49,6 @@ export class GameController {
   protected onHitEvent(evt: any): void {
     this.model.incrementScore(evt.enemy);
     this.getGameUIDataManager().game.score.value = this.model.getScore();
-    this.getGameUIDataManager().game.lives.value = 2;
   }
 
   

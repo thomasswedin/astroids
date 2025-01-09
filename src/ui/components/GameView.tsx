@@ -150,7 +150,6 @@ export default defineComponent({
           enemies.add(newAstroid);
         }
       }
-
     });
 
     watch(uiDataManager.game.score.ref, (newValue) => {

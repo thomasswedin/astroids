@@ -14,6 +14,7 @@ export class LivesPanelShip extends Phaser.GameObjects.Sprite {
         if (this.body instanceof Phaser.Physics.Arcade.Body) {
             this.body.setCollideWorldBounds(false);
         }
+        this.scene.add.existing(this);
     }
 
     protected create() {
