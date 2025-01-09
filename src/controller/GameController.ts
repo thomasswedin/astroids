@@ -38,6 +38,7 @@ export class GameController {
   protected addEventListeners(): void {
     this.getGameEventManager().addEventListener(GameEvents.GameSetupComplete, this.onGameSetupComplete, this);
     this.getGameEventManager().addEventListener(GameEvents.HitEvent, this.onHitEvent, this);
+    this.getGameEventManager().addEventListener(GameEvents.ShipCollisionEvent, this.onShipCollisionEvent, this);
   }
 
   protected onGameSetupComplete(): void {
@@ -51,5 +52,13 @@ export class GameController {
     this.getGameUIDataManager().game.score.value = this.model.getScore();
   }
 
-  
+  protected onShipCollisionEvent(): void {
+    if (this.model.lives > 0) {
+      this.model.decrementLives();
+      this.getGameUIDataManager().game.lives.value = this.model.lives;
+    } else {
+      this.getGameUIDataManager().game.gameOver.value = true;
+    }
+  }
+
 }

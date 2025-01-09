@@ -70,7 +70,7 @@ export default defineComponent({
         });
 
         new Background(this, 0, 0);
-        livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0, 'lives');
+        livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0);
 
         ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
 
@@ -92,6 +92,7 @@ export default defineComponent({
           const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
           const angle = (ship as Phaser.GameObjects.Sprite).angle;
           ship.destroy();
+          uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
 
           explosion = new Explosion(this, position.x, position.y, angle);
           handleAstroidHitEnemy.call(this, astroid as Phaser.GameObjects.Sprite);

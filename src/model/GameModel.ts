@@ -1,12 +1,18 @@
 export class GameModel {
-  private score: number;
+  private _score: number;
+  private _lives: number;
 
   constructor() {
-    this.score = 0;
+    this._score = 0;
+    this._lives = 3;
   }
 
   public getScore(): number {
-    return this.score;
+    return this._score;
+  }
+
+  public get lives(): number {
+    return this._lives;
   }
 
   public incrementScore(sizeType: number): void {
@@ -26,7 +32,21 @@ export class GameModel {
     }
   }
 
-  protected addScore(score: number): void {
-    this.score += score;
+  public resetScore(): void {
+    this._score = 0;
   }
+
+  public resetLives(): void {
+    this._lives = 3;
+  }
+
+  public decrementLives(): void {
+    this._lives--;
+  }
+
+  protected addScore(score: number): void {
+    this._score += score;
+  }
+
+
 }

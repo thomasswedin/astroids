@@ -6,5 +6,6 @@ export class UIDataManager {
         score: new UIPropertyRef(0),
         lives: new UIPropertyRef(0),
         level: new UIPropertyRef(0),
+        gameOver: new UIPropertyRef(false)
     };
 }
