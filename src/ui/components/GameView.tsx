@@ -3,7 +3,6 @@ import { defineComponent, inject, onMounted, ref, watch } from 'vue';
 import type { IUIServices } from '../../UIController';
 import { servicesKey } from '../../UIController';
 import { UIDataManager } from "../data/UIDataManager";
-import { GameEventManager } from "../events/game/GameEventManager";
 import { GameEvents } from '../events/game/GameEvents';
 import { UIEventManager } from "../events/ui/UIEventManager";
 import { Astroid } from "./Astroid";
@@ -21,7 +20,6 @@ export default defineComponent({
 
     const services: IUIServices = inject(servicesKey) as IUIServices;
     const uiEventManager: UIEventManager = services.uiEventManager;
-    const gameEventManager: GameEventManager = services.gameEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
     let ship: Ship;
     let explosion: Explosion;

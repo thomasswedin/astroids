@@ -18,6 +18,7 @@ export class Explosion extends Phaser.GameObjects.Sprite {
 
 
         this._debug ? this.drawSurroundedBox() : null;
+        this.drawShipPices();
 
         //set the position of the explosion to the position of the ship
         //this.setPosition(x, y);
