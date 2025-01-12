@@ -44,6 +44,12 @@ export default defineComponent({
         scene: {
           create: create,
           update: update
+        },
+        input: {
+          keyboard: true,
+          mouse: true,
+          touch: true,
+          gamepad: true
         }
       };
 
@@ -60,11 +66,6 @@ export default defineComponent({
       }
 
       function create(this: Phaser.Scene) {
-        /*this.input.on('pointerdown', () => {
-          uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
-          gameEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: 10 });
-        });*/
- 
         this.events.on('shoot', (bullet: Bullet) => {
           bullets.add(bullet);
         });
@@ -164,9 +165,8 @@ export default defineComponent({
     });
 
     return () => (
-      <div>
-        <div id='score-container'>Score: {score.value}</div>
-      </div>
+      <>
+      </>
     );
   },
 });

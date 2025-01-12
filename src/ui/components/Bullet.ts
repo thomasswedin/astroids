@@ -7,6 +7,10 @@ export class Bullet extends Phaser.GameObjects.Sprite {
     private _movementDistance: number = 0;
 
     constructor(scene: Phaser.Scene, x: number, y: number, angle: number) {
+        //Check if the bullet is being created in the correct scene
+        if (!scene) {
+            return;
+        }
         super(scene, x, y, 'bullet');
         this.scene = scene;
         this._scaleFactor = 1;

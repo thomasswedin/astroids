@@ -14,6 +14,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
     private _heightOfShipTexture: number;
     private _debug: boolean = false;
     private lastShotTime: number | undefined;
+    private _hyperModeActive: boolean = false;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'ship');
@@ -39,13 +40,15 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
         this.scene.physics.world.enable(this);
-        
+
     }
 
     update(): void {
         this.moveShip();
         this.wrapAroundScreen();
         this.shootingCheck();
+        this._hyperModeCheck();
+        this.gamepadButtonControlConsoleLog();
     }
 
     protected create() {
@@ -185,7 +188,13 @@ export class Ship extends Phaser.GameObjects.Sprite {
         const body = this.body as Phaser.Physics.Arcade.Body;
         const currentVelocity = new Phaser.Math.Vector2(body.velocity.x, body.velocity.y);
 
-        if (this.cursors.up?.isDown) {
+        const gamepad = this.scene.input.gamepad && this.scene.input.gamepad.total ? this.scene.input.gamepad.getPad(0) : undefined;
+
+        const upPressed = this.cursors.up?.isDown || gamepad?.buttons[7].pressed;
+        const leftPressed = this.cursors.left?.isDown || gamepad?.buttons[14].pressed;
+        const rightPressed = this.cursors.right?.isDown || gamepad?.buttons[15].pressed;
+
+        if (upPressed) {
             const angleInRadians = Phaser.Math.DegToRad(this.angle - 90);
             const accelerationVector = new Phaser.Math.Vector2(
                 Math.cos(angleInRadians) * this.acceleration,
@@ -208,10 +217,19 @@ export class Ship extends Phaser.GameObjects.Sprite {
             }
         }
 
-        if (this.cursors.left?.isDown) {
+        if (leftPressed) {
             this.angle -= 2;
-        } else if (this.cursors.right?.isDown) {
+        } else if (rightPressed) {
             this.angle += 2;
+        }
+
+        // Gamepad left stick for movement
+        if (gamepad) {
+            const leftStickX = gamepad.axes[0];
+
+            if (Math.abs(leftStickX.value) > 0.1) {
+                this.angle += leftStickX.value * 2; // Adjust rotation speed as needed
+            }
         }
     }
 
@@ -236,7 +254,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
     }
 
     private shootingCheck(): void {
-        if(!this.scene){
+        if (!this.scene) {
             return;
         }
 
@@ -262,6 +280,25 @@ export class Ship extends Phaser.GameObjects.Sprite {
                 }
             }
         }
+
+        const gamepad = this.scene.input.gamepad && this.scene.input.gamepad.total ? this.scene.input.gamepad.getPad(0) : undefined;
+        if (gamepad) {
+            const shootButtonPressed = gamepad.buttons[0].pressed;
+
+            if (shootButtonPressed) {
+                const currentTime = this.scene.time.now;
+                if (this.lastShotTime === undefined || currentTime - this.lastShotTime > 700) {
+                    this.shoot();
+                    this.scene.time.addEvent({
+                        delay: 100,
+                        callback: this.shoot,
+                        callbackScope: this,
+                        repeat: 1
+                    });
+                    this.lastShotTime = currentTime;
+                }
+            }
+        }
     }
 
     private shoot(): void {
@@ -270,5 +307,45 @@ export class Ship extends Phaser.GameObjects.Sprite {
         const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
         const bullet = new Bullet(this.scene, bulletX, bulletY, this.angle);
         this.scene.events.emit('shoot', bullet);
+    }
+
+    private _hyperModeCheck(): void {
+        if (!this.scene || !this.scene.input.keyboard) return;
+
+        const hyperModeKey = this.scene.input.keyboard.addKey('H');
+        if (Phaser.Input.Keyboard.JustDown(hyperModeKey)) {
+            // Randomize the ship's position
+            const margin = 50;
+            this.x = Math.random() * (this.scene.scale.width - 2 * margin) + margin;
+            this.y = Math.random() * (this.scene.scale.height - 2 * margin) + margin;
+            this.updateTexture();
+        }
+
+        const gamepad = this.scene.input.gamepad && this.scene.input.gamepad.total ? this.scene.input.gamepad.getPad(0) : undefined;
+        if (gamepad) {
+            const hyperModeButtonPressed = gamepad.buttons[2].pressed;
+            if (hyperModeButtonPressed && !this._hyperModeActive) {
+            this._hyperModeActive = true;
+            // Randomize the ship's position
+            const margin = 50;
+            this.x = Math.random() * (this.scene.scale.width - 2 * margin) + margin;
+            this.y = Math.random() * (this.scene.scale.height - 2 * margin) + margin;
+            this.updateTexture();
+            } else if (!hyperModeButtonPressed) {
+            this._hyperModeActive = false;
+            }
+        }
+    }
+
+    private gamepadButtonControlConsoleLog(): void {
+        if (!this.scene) return;
+
+        const gamepad = this.scene.input.gamepad && this.scene.input.gamepad.total ? this.scene.input.gamepad.getPad(0) : undefined;
+        if (gamepad) {
+            const buttonPressed = gamepad.buttons.find(button => button.pressed);
+            if (buttonPressed) {
+                console.log(`Button ${buttonPressed.index} pressed`);
+            }
+        }
     }
 }
