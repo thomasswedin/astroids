@@ -19,38 +19,11 @@ export class Explosion extends Phaser.GameObjects.Sprite {
 
         this._debug ? this.drawSurroundedBox() : null;
         this.drawShipPices();
-
-        //set the position of the explosion to the position of the ship
-        //this.setPosition(x, y);
-        //this.scene.add.existing(this);
-        //this.scene.physics.add.existing(this);
-        //this.scene.physics.world.enable(this);
-        //this._angle = angle;
-        //this.setAngle(angle);
-
-
     }
-
-    update(): void {
-        /*if (this._shipVecContainer && this._shipVecContainer.list && this._shipVecContainer.list.length > 0) {
-            this._shipVecContainer.each((child: Phaser.GameObjects.GameObject) => {
-                if (child instanceof Phaser.GameObjects.Graphics) {
-                    this.scene.physics.add.existing(child);
-                    const body = child.body as Phaser.Physics.Arcade.Body;
-                    const x = Math.cos(this._angle) * this._speed;
-                    const y = Math.sin(this._angle) * this._speed;
-                    body.setVelocity(x, y);
-                }
-            });
-        }*/
-    }
-
-
 
     protected drawShipPices(): Phaser.GameObjects.Container {
 
         let _shipVecContainer: Phaser.GameObjects.Container = new Phaser.GameObjects.Container(this.scene);
-
 
         const shipPoints = [
             { x: 0, y: -20 },
