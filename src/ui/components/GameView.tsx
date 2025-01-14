@@ -8,6 +8,7 @@ import { UIEventManager } from "../events/ui/UIEventManager";
 import { Astroid } from "./Astroid";
 import { Background } from "./Background";
 import { Bullet } from './Bullet';
+import { EnemyShip } from './EnemyShip';
 import { Explosion } from './Explosion';
 import { LivesPanel } from './LivesPanel';
 import { Ship } from "./Ship";
@@ -28,9 +29,14 @@ export default defineComponent({
     let bullets: Phaser.GameObjects.Group;
     let livesPanel: LivesPanel;
     let currentScene: Phaser.Scene;
+    let enemyShip: EnemyShip;
 
     function newLife(scene: Phaser.Scene) {
       ship = new Ship(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2);
+    }
+
+    function createNewEnemy(scene: Phaser.Scene) {
+      enemyShip = new EnemyShip(scene, 0, scene.cameras.main.height / 4, ship);
     }
 
     function addColliders(scene: Phaser.Scene) {
@@ -107,33 +113,27 @@ export default defineComponent({
 
       function create(this: Phaser.Scene) {
         currentScene = this;
-        this.events.on('shoot', (bullet: Bullet) => {
+        currentScene.events.on('shoot', (bullet: Bullet) => {
           bullets.add(bullet);
         });
 
-        new Background(this, 0, 0);
-        livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0);
+        new Background(currentScene, 0, 0);
+        livesPanel = new LivesPanel(currentScene, currentScene.cameras.main.width - 100, 0);
 
-        //ship = new Ship(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
-
-        bullets = this.add.group({
+        bullets = currentScene.add.group({
           classType: Bullet,
           runChildUpdate: true
         });
 
-        enemies = this.add.group({
+        enemies = currentScene.add.group({
           classType: Astroid,
           runChildUpdate: true,
         });
 
-        createEnemy(this);
-
-        
+        createEnemy(currentScene);
 
         uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
       }
-
-      
 
       function createEnemy(scene: Phaser.Scene) {
         for (let i = 0; i < 4; i++) {
@@ -155,8 +155,6 @@ export default defineComponent({
           enemies.add(enemy);
         }
       }
-
-      
     });
 
     watch(uiDataManager.game.score.ref, (newValue) => {
@@ -173,6 +171,9 @@ export default defineComponent({
         addColliders(currentScene);
 
       }
+
+      createNewEnemy(currentScene);
+
     });
 
     return () => (

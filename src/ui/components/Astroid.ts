@@ -18,7 +18,7 @@ export class Astroid extends Phaser.GameObjects.Sprite {
         this._sizeType = sizeType
         this._scaleFactor = Math.pow(2, sizeType);
         this.scene = scene;
-        this.speed = 80;
+        this.speed = 10;//80;
         this._thickness = 2;
         this._angle = Math.random() * Math.PI * 2;
 
