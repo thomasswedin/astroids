@@ -5,7 +5,7 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
   private _widthOfShipTexture: number;
   private _heightOfShipTexture: number;
   private enemyShipTextureKey: string = "enemyShipTextureKey";
-  private _scaleFactor = 1.5;
+  private _scaleFactor = 1.6;
 
   constructor(scene: Phaser.Scene, x: number, y: number, target: Phaser.GameObjects.Sprite) {
     super(scene, x, y, "enemy_ship");
@@ -54,8 +54,8 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     }));
 
     const middleLine = [
-      { x: -15, y: 0 },
-      { x: 15, y: 0 }
+      { x: -13, y: 1 },
+      { x: 13, y: 1 }
     ].map(point => ({
       x: point.x * this._scaleFactor,
       y: point.y * this._scaleFactor
