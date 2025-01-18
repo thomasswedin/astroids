@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { Bullet } from './Bullet';
+
 //Create a EnemyShip class. This class will be used to create enemy ships that will attack the player's ship.
 export class EnemyShip extends Phaser.GameObjects.Sprite {
   private target: Phaser.GameObjects.Sprite;
@@ -6,6 +8,7 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
   private _heightOfShipTexture: number;
   private enemyShipTextureKey: string = "enemyShipTextureKey";
   private _scaleFactor = 1.6;
+  private shootCounter = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number, target: Phaser.GameObjects.Sprite) {
     super(scene, x, y, "enemy_ship");
@@ -19,6 +22,15 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
     this.scene.physics.moveToObject(this, this.target, 100);
+    this.scene.physics.moveTo(this, 800, y, 100);
+  }
+
+  update(): void {
+    this.shootCounter++;
+    if (this.shootCounter >= 100) {
+      this.shoot();
+      this.shootCounter = 0;
+    }
   }
 
   protected create() {
@@ -26,6 +38,16 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     shipVec.generateTexture(this.enemyShipTextureKey, this._widthOfShipTexture, this._heightOfShipTexture);
     this.setTexture(this.enemyShipTextureKey);
   }
+
+  private shoot(): void {
+    // Depending on the angle to the target, the enemy ship will shoot a bullet in that direction.
+    const angleInRadians = Phaser.Math.Angle.BetweenPoints(this.getCenter(), this.target.getCenter());
+    const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;
+    const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
+    const bullet = new Bullet(this.scene, bulletX, bulletY, Phaser.Math.RadToDeg(angleInRadians));
+    bullet.setRotation(angleInRadians); // Set the rotation of the bullet to match the angle
+    this.scene.events.emit('shoot', bullet);
+}
 
   protected drawShip(): Phaser.GameObjects.Graphics {
     const shipGraphics = new Phaser.GameObjects.Graphics(this.scene);
@@ -36,18 +58,18 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
 
     const saucerPoints = [
       { x: -15, y: 0 },
-    { x: -10, y: -3 },
-    { x: -5, y: -5 },
-    { x: -3, y: -7 },
-    { x: 3, y: -7 },
-    { x: 5, y: -5 },
-    { x: 10, y: -3 },
-    { x: 15, y: 0 },
-    { x: 10, y: 3 },
-    { x: 5, y: 5 },
-    { x: -5, y: 5 },
-    { x: -10, y: 3 },
-    { x: -15, y: 0 }
+      { x: -10, y: -3 },
+      { x: -5, y: -5 },
+      { x: -3, y: -7 },
+      { x: 3, y: -7 },
+      { x: 5, y: -5 },
+      { x: 10, y: -3 },
+      { x: 15, y: 0 },
+      { x: 10, y: 3 },
+      { x: 5, y: 5 },
+      { x: -5, y: 5 },
+      { x: -10, y: 3 },
+      { x: -15, y: 0 }
     ].map(point => ({
       x: point.x * this._scaleFactor,
       y: point.y * this._scaleFactor
@@ -74,8 +96,8 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     // Calculate bounds
     const minX = Math.min(...shipPoints.map(p => p.x));
     const maxX = Math.max(...shipPoints.map(p => p.x));
-    const minY = Math.min(...shipPoints.map(p => p.y))-1;
-    const maxY = Math.max(...shipPoints.map(p => p.y))+1;
+    const minY = Math.min(...shipPoints.map(p => p.y)) - 1;
+    const maxY = Math.max(...shipPoints.map(p => p.y)) + 1;
 
     this._widthOfShipTexture = maxX - minX;
     this._heightOfShipTexture = maxY - minY;

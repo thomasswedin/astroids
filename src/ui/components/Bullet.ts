@@ -24,21 +24,20 @@ export class Bullet extends Phaser.GameObjects.Sprite {
         this.scene.physics.world.enable(this);
 
         this.setAngle(angle);
-        const radianAngle = Phaser.Math.DegToRad(angle - 90);
+        const radianAngle = Phaser.Math.DegToRad(angle);
         const velocityX = Math.cos(radianAngle) * this.speed;
         const velocityY = Math.sin(radianAngle) * this.speed;
         (this.body as Phaser.Physics.Arcade.Body).setVelocity(velocityX, velocityY);
-
     }
 
     update(): void {
         if (this.body instanceof Phaser.Physics.Arcade.Body) {
             this.wrapAroundScreen();
         }
-        
+
         this._movementDistance++;
 
-        if(this._movementDistance > 100) {
+        if (this._movementDistance > 100) {
             this.destroy();
         }
     }

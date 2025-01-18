@@ -36,7 +36,7 @@ export default defineComponent({
     }
 
     function createNewEnemy(scene: Phaser.Scene) {
-      enemyShip = new EnemyShip(scene, 0, scene.cameras.main.height / 4, ship);
+      enemyShip = new EnemyShip(scene, -120, scene.cameras.main.height / 4, ship);
     }
 
     function addColliders(scene: Phaser.Scene) {
@@ -109,10 +109,14 @@ export default defineComponent({
         if (ship) {
           ship.update();
         }
+        if (enemyShip) {
+          enemyShip.update();
+        }
       }
 
       function create(this: Phaser.Scene) {
         currentScene = this;
+        
         currentScene.events.on('shoot', (bullet: Bullet) => {
           bullets.add(bullet);
         });
