@@ -5,8 +5,14 @@ export class Bullet extends Phaser.GameObjects.Sprite {
     private _scaleFactor: number | undefined;
     private _thickness: number | undefined;
     private _movementDistance: number = 0;
+    private _type!: String;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, angle: number) {
+    //Create two types of bullets, one for the player and one for the enemy
+    //types should be two static strings, 'player' and 'enemy'
+    static PLAYER = 'player';
+    static ENEMY = 'enemy';
+
+    constructor(scene: Phaser.Scene, x: number, y: number, angle: number, type:String) {
         //Check if the bullet is being created in the correct scene
         if (!scene) {
             return;
@@ -16,6 +22,7 @@ export class Bullet extends Phaser.GameObjects.Sprite {
         this._scaleFactor = 1;
         this._thickness = 2;
         this._movementDistance = 0;
+        this._type = type;
 
         this.drawBullet();
 
@@ -28,6 +35,11 @@ export class Bullet extends Phaser.GameObjects.Sprite {
         const velocityX = Math.cos(radianAngle) * this.speed;
         const velocityY = Math.sin(radianAngle) * this.speed;
         (this.body as Phaser.Physics.Arcade.Body).setVelocity(velocityX, velocityY);
+    }
+
+    //Create getter for the type of bullet
+    get bulletType() {
+        return this._type;
     }
 
     update(): void {

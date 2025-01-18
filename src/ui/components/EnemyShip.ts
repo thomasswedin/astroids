@@ -44,17 +44,13 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     const angleInRadians = Phaser.Math.Angle.BetweenPoints(this.getCenter(), this.target.getCenter());
     const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;
     const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
-    const bullet = new Bullet(this.scene, bulletX, bulletY, Phaser.Math.RadToDeg(angleInRadians));
+    const bullet = new Bullet(this.scene, bulletX, bulletY, Phaser.Math.RadToDeg(angleInRadians), Bullet.ENEMY);
     bullet.setRotation(angleInRadians); // Set the rotation of the bullet to match the angle
     this.scene.events.emit('shoot', bullet);
 }
 
   protected drawShip(): Phaser.GameObjects.Graphics {
     const shipGraphics = new Phaser.GameObjects.Graphics(this.scene);
-
-    /*{ x: -10, y: -15 },
-      { x: -10, y: -20 },
-      { x: 10, y: -20 }*/
 
     const saucerPoints = [
       { x: -15, y: 0 },

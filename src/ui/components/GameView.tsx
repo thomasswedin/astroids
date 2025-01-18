@@ -52,8 +52,21 @@ export default defineComponent({
       }, undefined, scene);
 
       scene.physics.add.collider(bullets, enemies, function (this: Phaser.Scene, bullet, astroid) {
-        handleAstroidHitEnemy.call(this, astroid as Phaser.GameObjects.Sprite);
+        if ((bullet as Bullet).bulletType === Bullet.PLAYER) {
+          handleAstroidHitEnemy.call(this, astroid as Phaser.GameObjects.Sprite);
+          bullet.destroy();
+        }
+      }, undefined, scene);
+
+      scene.physics.add.collider(bullets, ship, function (this: Phaser.Scene, bullet, ship) {
+        console.log('Collision detected between ship and bullet');
+        const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
+        const angle = (ship as Phaser.GameObjects.Sprite).angle;
         bullet.destroy();
+        ship.destroy();
+        uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
+
+        explosion = new Explosion(this, position.x, position.y, angle);
       }, undefined, scene);
     }
 
@@ -116,7 +129,7 @@ export default defineComponent({
 
       function create(this: Phaser.Scene) {
         currentScene = this;
-        
+
         currentScene.events.on('shoot', (bullet: Bullet) => {
           bullets.add(bullet);
         });
