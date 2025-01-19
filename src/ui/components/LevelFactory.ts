@@ -5,10 +5,12 @@ export class LevelFactory {
     private _maxLevel: number;
     private _astroids: number = 0;
     private _enemies: IEnemyData[] = [];
+    private _currentScene: Phaser.Scene;
 
-    constructor(maxLevel: number) {
+    constructor(scene: Phaser.Scene, maxLevel: number) {
         this._currentLevel = 1;
         this._maxLevel = maxLevel;
+        this._currentScene = scene;
         this.createLevelObjects(this._currentLevel);
     }
 
@@ -38,7 +40,7 @@ export class LevelFactory {
             case 1:
                 console.log("Creating level 1 objects");
                 this._astroids = 4;
-                //this._enemies.push({ timeBeforAppear: 1000, enemyType: EnemyShip as IGameObject, enemySpeed: 100 });
+                this._enemies.push({ timeBeforAppear: 1000, enemyType: "EnemyShip", x: -120, y: this._currentScene.cameras.main.height / 4, enemySpeed: 100});
                 break;
             case 2:
                 console.log("Creating level 2 objects");

@@ -55,7 +55,7 @@ export default defineComponent({
         currentScene = this;
         new Background(currentScene, 0, 0);
         livesPanel = new LivesPanel(currentScene, currentScene.cameras.main.width - 100, 0);
-        levelFactory = new LevelFactory(3);
+        levelFactory = new LevelFactory(currentScene, 3);
         levelEngine = new LevelEngine(currentScene, levelFactory, uiEventManager);
 
         levelEngine.create();
@@ -81,7 +81,6 @@ export default defineComponent({
       if (newValue > 0) {
         levelEngine.newLife(currentScene);
       }
-      levelEngine.createNewEnemy(currentScene);
     });
 
     return () => (
