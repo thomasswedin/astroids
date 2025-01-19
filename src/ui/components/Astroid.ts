@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
+import type { IGameObject } from './IGameObject';
 
-export class Astroid extends Phaser.GameObjects.Sprite {
+export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
 
     private speed: number;
     private _scaleFactor = 8;
@@ -41,7 +42,7 @@ export class Astroid extends Phaser.GameObjects.Sprite {
         this.body = this.body as Phaser.Physics.Arcade.Body;
     }
 
-    
+
 
     update(): void {
         this.moveAstroid();

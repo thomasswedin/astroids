@@ -10,6 +10,7 @@ import { Background } from "./Background";
 import { Bullet } from './Bullet';
 import { EnemyShip } from './EnemyShip';
 import { Explosion } from './Explosion';
+import { LevelFactory } from './LevelFactory';
 import { LivesPanel } from './LivesPanel';
 import { Ship } from "./Ship";
 
@@ -30,13 +31,14 @@ export default defineComponent({
     let livesPanel: LivesPanel;
     let currentScene: Phaser.Scene;
     let enemyShip: EnemyShip;
+    let levelFactory: LevelFactory;
 
     function newLife(scene: Phaser.Scene) {
       ship = new Ship(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2);
     }
 
     function createNewEnemy(scene: Phaser.Scene) {
-      enemyShip = new EnemyShip(scene, -120, scene.cameras.main.height / 4, ship);
+      enemyShip = new EnemyShip(scene, -120, scene.cameras.main.height / 4, ship, "enemyShip", 3);
     }
 
     function addColliders(scene: Phaser.Scene) {
@@ -130,6 +132,8 @@ export default defineComponent({
       function create(this: Phaser.Scene) {
         currentScene = this;
 
+        levelFactory = new LevelFactory(3);
+
         currentScene.events.on('shoot', (bullet: Bullet) => {
           bullets.add(bullet);
         });
@@ -147,13 +151,13 @@ export default defineComponent({
           runChildUpdate: true,
         });
 
-        createEnemy(currentScene);
+        createAstroids(currentScene);
 
         uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
       }
 
-      function createEnemy(scene: Phaser.Scene) {
-        for (let i = 0; i < 4; i++) {
+      function createAstroids(scene: Phaser.Scene) {
+        for (let i = 0; i < levelFactory.getAmountOfAstroids(); i++) {
           let x = Math.random() * scene.cameras.main.width;
           let y = Math.random() * scene.cameras.main.height;
           const centerX = scene.cameras.main.width / 2;

@@ -1,18 +1,21 @@
 import Phaser from 'phaser';
 import { Bullet } from './Bullet';
+import type { IGameObject } from './IGameObject';
 
-//Create a EnemyShip class. This class will be used to create enemy ships that will attack the player's ship.
-export class EnemyShip extends Phaser.GameObjects.Sprite {
+export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject {
   private target: Phaser.GameObjects.Sprite;
   private _widthOfShipTexture: number;
   private _heightOfShipTexture: number;
   private enemyShipTextureKey: string = "enemyShipTextureKey";
   private _scaleFactor = 1.6;
   private shootCounter = 0;
+  private _id: string;
+  private _sizeType: number = 0;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Phaser.GameObjects.Sprite) {
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Phaser.GameObjects.Sprite, id: string, sizeType: number) {
     super(scene, x, y, "enemy_ship");
-
+    this._id = id;
+    this._sizeType = sizeType
     this.scene = scene;
     this.target = target;
 
@@ -33,6 +36,18 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     }
   }
 
+  get sizeType(): number {
+    return this._sizeType;
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
+  set id(id: string) {
+    this._id = id;
+  }
+
   protected create() {
     const shipVec: Phaser.GameObjects.Graphics = this.drawShip();
     shipVec.generateTexture(this.enemyShipTextureKey, this._widthOfShipTexture, this._heightOfShipTexture);
@@ -47,7 +62,7 @@ export class EnemyShip extends Phaser.GameObjects.Sprite {
     const bullet = new Bullet(this.scene, bulletX, bulletY, Phaser.Math.RadToDeg(angleInRadians), Bullet.ENEMY);
     bullet.setRotation(angleInRadians); // Set the rotation of the bullet to match the angle
     this.scene.events.emit('shoot', bullet);
-}
+  }
 
   protected drawShip(): Phaser.GameObjects.Graphics {
     const shipGraphics = new Phaser.GameObjects.Graphics(this.scene);
