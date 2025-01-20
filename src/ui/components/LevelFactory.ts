@@ -34,6 +34,10 @@ export class LevelFactory {
         return this._astroids;
     }
 
+    public getEnemies(): IEnemyData[] {
+        return this._enemies;
+    }
+
     protected createLevelObjects(level: number): void {
         this._enemies = [];
         switch (level) {

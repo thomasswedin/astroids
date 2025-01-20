@@ -14,8 +14,9 @@ export class LevelEngine {
     protected _levelFactory!: LevelFactory;
     protected _ship!: Ship;
     protected _explosion!: Explosion;
-    protected _enemies!: Phaser.GameObjects.Group;
+    protected _astroids!: Phaser.GameObjects.Group;
     protected _bullets!: Phaser.GameObjects.Group;
+    protected _enemies!: Phaser.GameObjects.Group;
     protected _enemyShip!: EnemyShip;
     protected _uiEventManager!: UIEventManager;
 
@@ -35,12 +36,18 @@ export class LevelEngine {
             runChildUpdate: true
         });
 
-        this._enemies = this._currentScene.add.group({
+        this._astroids = this._currentScene.add.group({
             classType: Astroid,
             runChildUpdate: true,
         });
 
+        /*this._enemies = this._currentScene.add.group({
+            classType: EnemyShip,
+            runChildUpdate: true,
+        });*/
+
         this.createAstroids(this._currentScene);
+        //this.createNewEnemy(this._currentScene);
     }
 
     public update() {
@@ -59,7 +66,7 @@ export class LevelEngine {
         this.createNewEnemy(this._currentScene);
     }
 
-    public createNewEnemy(scene: Phaser.Scene) {
+    protected createNewEnemy(scene: Phaser.Scene) {
         this._enemyShip = new EnemyShip(scene, -120, scene.cameras.main.height / 4, this._ship, "enemyShip", 3);
     }
 
@@ -79,8 +86,8 @@ export class LevelEngine {
             x = Math.round(x / 10) * 10;
             y = Math.round(y / 10) * 10;
 
-            const enemy = new Astroid(scene, x, y, "astroid" + i, 3);
-            this._enemies.add(enemy);
+            const astroid = new Astroid(scene, x, y, "astroid" + i, 3);
+            this._astroids.add(astroid);
         }
     }
 
@@ -102,12 +109,12 @@ export class LevelEngine {
         const newEnemies = 2;
         for (let i = 0; i < newEnemies; i++) {
             const newAstroid = new Astroid(this._currentScene, position.x, position.y, parentID + "-" + i, newSizeType);
-            this._enemies.add(newAstroid);
+            this._astroids.add(newAstroid);
         }
     }
 
     protected addColliders() {
-        this._currentScene.physics.add.collider(this._ship, this._enemies, (ship, astroid) => {
+        this._currentScene.physics.add.collider(this._ship, this._astroids, (ship, astroid) => {
             console.log('Collision detected between ship and astroid');
             const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
             const angle = (ship as Phaser.GameObjects.Sprite).angle;
@@ -118,7 +125,7 @@ export class LevelEngine {
             this.handleAstroidHitEnemy(astroid as Phaser.GameObjects.Sprite);
         }, undefined, this._currentScene);
 
-        this._currentScene.physics.add.collider(this._bullets, this._enemies, (bullet, astroid) => {
+        this._currentScene.physics.add.collider(this._bullets, this._astroids, (bullet, astroid) => {
             if ((bullet as Bullet).bulletType === Bullet.PLAYER) {
                 this.handleAstroidHitEnemy(astroid as Phaser.GameObjects.Sprite);
                 bullet.destroy();
