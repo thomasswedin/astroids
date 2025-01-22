@@ -43,8 +43,8 @@ export class LevelFactory {
         switch (level) {
             case 1:
                 console.log("Creating level 1 objects");
-                this._astroids = 4;
-                this._enemies.push({ timeBeforAppear: 1000, enemyType: "EnemyShip", x: -120, y: this._currentScene.cameras.main.height / 4, enemySpeed: 100});
+                this._astroids = 10;
+                this._enemies.push({ timeBeforAppear: 10000, enemyType: "EnemyShip", x: -120, y: this._currentScene.cameras.main.height / 4, enemySpeed: 100});
                 break;
             case 2:
                 console.log("Creating level 2 objects");

@@ -47,7 +47,30 @@ export class LevelEngine {
         });*/
 
         this.createAstroids(this._currentScene);
-        //this.createNewEnemy(this._currentScene);
+        this.createNewEnemies(this._currentScene);
+    }
+
+    protected createNewEnemies(scene: Phaser.Scene) {
+        const enemies = this._levelFactory.getEnemies();
+        enemies.forEach(enemy => {
+            if (enemy.enemyType === "EnemyShip") {
+                scene.time.addEvent({
+                    delay: enemy.timeBeforAppear,
+                    callback: () => {
+                        this._enemyShip = new EnemyShip(scene, enemy.x, enemy.y, this._ship, "enemyShip", 3);
+                    },
+                    callbackScope: this
+                });
+            }
+        });
+    }
+
+    public gameOver() {
+        this._ship.destroy();
+        this._enemyShip.destroy();
+        this._astroids.clear(true, true);
+        this._bullets.clear(true, true);
+        this._enemies.clear(true, true);
     }
 
     public update() {
@@ -63,7 +86,6 @@ export class LevelEngine {
     public newLife(scene: Phaser.Scene) {
         this._ship = new Ship(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2);
         this.addColliders();
-        this.createNewEnemy(this._currentScene);
     }
 
     protected createNewEnemy(scene: Phaser.Scene) {

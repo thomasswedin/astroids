@@ -80,7 +80,10 @@ export default defineComponent({
 
       if (newValue > 0) {
         levelEngine.newLife(currentScene);
-      }
+      } else {
+        gameOver.value = true;
+        levelEngine.gameOver();
+      } 
     });
 
     return () => (
