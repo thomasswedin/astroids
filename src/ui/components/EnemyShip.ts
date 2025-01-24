@@ -55,6 +55,7 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
   }
 
   private shoot(): void {
+    return;
     // Depending on the angle to the target, the enemy ship will shoot a bullet in that direction.
     const angleInRadians = Phaser.Math.Angle.BetweenPoints(this.getCenter(), this.target.getCenter());
     const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;

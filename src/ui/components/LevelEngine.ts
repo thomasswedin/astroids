@@ -17,7 +17,6 @@ export class LevelEngine {
     protected _astroids!: Phaser.GameObjects.Group;
     protected _bullets!: Phaser.GameObjects.Group;
     protected _enemies!: Phaser.GameObjects.Group;
-    protected _enemyShip!: EnemyShip;
     protected _uiEventManager!: UIEventManager;
 
     constructor(scene: Phaser.Scene, levelFactory: LevelFactory, uiEventManager: UIEventManager) {
@@ -41,13 +40,14 @@ export class LevelEngine {
             runChildUpdate: true,
         });
 
-        /*this._enemies = this._currentScene.add.group({
+        this._enemies = this._currentScene.add.group({
             classType: EnemyShip,
             runChildUpdate: true,
-        });*/
+        });
 
         this.createAstroids(this._currentScene);
         this.createNewEnemies(this._currentScene);
+        this.addColliders();
     }
 
     protected createNewEnemies(scene: Phaser.Scene) {
@@ -57,7 +57,8 @@ export class LevelEngine {
                 scene.time.addEvent({
                     delay: enemy.timeBeforAppear,
                     callback: () => {
-                        this._enemyShip = new EnemyShip(scene, enemy.x, enemy.y, this._ship, "enemyShip", 3);
+                        //Create a randow enemy ship id and pass it to the enemy ship. Like ""enemyShip" + i"
+                        this._enemies.add(new EnemyShip(scene, enemy.x, enemy.y, this._ship, "muu", 3));
                     },
                     callbackScope: this
                 });
@@ -67,7 +68,6 @@ export class LevelEngine {
 
     public gameOver() {
         this._ship.destroy();
-        this._enemyShip.destroy();
         this._astroids.clear(true, true);
         this._bullets.clear(true, true);
         this._enemies.clear(true, true);
@@ -77,19 +77,12 @@ export class LevelEngine {
         if (this._ship) {
             this._ship.update();
         }
-        if (this._enemyShip) {
-            this._enemyShip.update();
-        }
     }
 
 
     public newLife(scene: Phaser.Scene) {
         this._ship = new Ship(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2);
-        this.addColliders();
-    }
-
-    protected createNewEnemy(scene: Phaser.Scene) {
-        this._enemyShip = new EnemyShip(scene, -120, scene.cameras.main.height / 4, this._ship, "enemyShip", 3);
+        this.addShipColliders();
     }
 
     protected createAstroids(scene: Phaser.Scene) {
@@ -113,7 +106,7 @@ export class LevelEngine {
         }
     }
 
-    protected handleAstroidHitEnemy(this: LevelEngine, astroid: Phaser.GameObjects.Sprite) {
+    protected manageHitAstroid(this: LevelEngine, astroid: Phaser.GameObjects.Sprite) {
         const sizeType = (astroid as Astroid).sizeType;
         const position = new Phaser.Math.Vector2(astroid.x, astroid.y);
         const astroidID = (astroid as Astroid).id;
@@ -135,25 +128,28 @@ export class LevelEngine {
         }
     }
 
-    protected addColliders() {
-        this._currentScene.physics.add.collider(this._ship, this._astroids, (ship, astroid) => {
-            console.log('Collision detected between ship and astroid');
-            const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
-            const angle = (ship as Phaser.GameObjects.Sprite).angle;
-            ship.destroy();
-            this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
-
-            this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
-            this.handleAstroidHitEnemy(astroid as Phaser.GameObjects.Sprite);
-        }, undefined, this._currentScene);
-
-        this._currentScene.physics.add.collider(this._bullets, this._astroids, (bullet, astroid) => {
-            if ((bullet as Bullet).bulletType === Bullet.PLAYER) {
-                this.handleAstroidHitEnemy(astroid as Phaser.GameObjects.Sprite);
-                bullet.destroy();
-            }
-        }, undefined, this._currentScene);
-
+    /**
+     * Adds colliders for the ship with bullets and asteroids in the current scene.
+     * 
+     * This method sets up collision detection between the ship and bullets, and between the ship and asteroids.
+     * When a collision is detected, it handles the destruction of the involved objects and triggers the appropriate events.
+     * 
+     * - When a bullet collides with the ship:
+     *   - Logs the collision.
+     *   - Destroys both the bullet and the ship.
+     *   - Dispatches the `ShipCollisionEvent`.
+     *   - Creates an explosion at the ship's position and angle.
+     * 
+     * - When an asteroid collides with the ship:
+     *   - Logs the collision.
+     *   - Destroys the ship.
+     *   - Dispatches the `ShipCollisionEvent`.
+     *   - Creates an explosion at the ship's position and angle.
+     *   - Handles the asteroid hit on the enemy.
+     * 
+     * @protected
+     */
+    protected addShipColliders() {
         this._currentScene.physics.add.collider(this._bullets, this._ship, (bullet, ship) => {
             console.log('Collision detected between ship and bullet');
             const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
@@ -163,6 +159,51 @@ export class LevelEngine {
             this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
 
             this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
+        }, undefined, this._currentScene);
+
+        this._currentScene.physics.add.collider(this._ship, this._astroids, (ship, astroid) => {
+            console.log('Collision detected between ship and astroid');
+            const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
+            const angle = (ship as Phaser.GameObjects.Sprite).angle;
+            ship.destroy();
+            this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
+
+            this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
+            this.manageHitAstroid(astroid as Phaser.GameObjects.Sprite);
+        }, undefined, this._currentScene);
+
+        this._currentScene.physics.add.collider(this._ship, this._enemies, (ship, enemy) => {
+            const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
+            const angle = (ship as Phaser.GameObjects.Sprite).angle;
+            ship.destroy();
+            this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
+
+            this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
+            enemy.destroy();
+        }, undefined, this._currentScene);
+    }
+
+    /**
+     * Adds colliders to the current scene for handling collisions between bullets and asteroids, 
+     * and bullets and enemies. When a bullet of type PLAYER collides with an asteroid, 
+     * the asteroid hit handler is called and the bullet is destroyed. When a bullet of type PLAYER 
+     * collides with an enemy, both the enemy and the bullet are destroyed.
+     * 
+     * @protected
+     */
+    protected addColliders() {
+        this._currentScene.physics.add.collider(this._bullets, this._astroids, (bullet, astroid) => {
+            if ((bullet as Bullet).bulletType === Bullet.PLAYER) {
+                this.manageHitAstroid(astroid as Phaser.GameObjects.Sprite);
+                bullet.destroy();
+            }
+        }, undefined, this._currentScene);
+
+        this._currentScene.physics.add.collider(this._bullets, this._enemies, (bullet, enemy) => {
+            if ((bullet as Bullet).bulletType === Bullet.PLAYER) {
+                enemy.destroy();
+                bullet.destroy();
+            }
         }, undefined, this._currentScene);
     }
 }
