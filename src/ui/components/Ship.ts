@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { GameConstants } from '../constants/GameConstants';
 import { Bullet } from './Bullet';
 
 export class Ship extends Phaser.GameObjects.Sprite {
@@ -306,7 +307,7 @@ export class Ship extends Phaser.GameObjects.Sprite {
         const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;
         const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
         const bullet = new Bullet(this.scene, bulletX, bulletY, this.angle - 90, Bullet.PLAYER); // Adjust angle by -90 degrees
-        this.scene.events.emit('shoot', bullet);
+        this.scene.events.emit(GameConstants.SHOOT, bullet);
     }
 
     private _hyperModeCheck(): void {

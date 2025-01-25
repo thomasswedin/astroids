@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { GameConstants } from '../constants/GameConstants';
 import { Bullet } from './Bullet';
 import type { IGameObject } from './IGameObject';
 
@@ -62,7 +63,7 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
     const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
     const bullet = new Bullet(this.scene, bulletX, bulletY, Phaser.Math.RadToDeg(angleInRadians), Bullet.ENEMY);
     bullet.setRotation(angleInRadians); // Set the rotation of the bullet to match the angle
-    this.scene.events.emit('shoot', bullet);
+    this.scene.events.emit(GameConstants.SHOOT, bullet);
   }
 
   protected drawShip(): Phaser.GameObjects.Graphics {
