@@ -56,7 +56,7 @@ export class LevelEngine {
     protected createNewEnemies(scene: Phaser.Scene) {
         const enemies = this._levelFactory.getEnemies();
         enemies.forEach(enemy => {
-            if (enemy.enemyType === "EnemyShip") {
+            if (enemy.enemyType === GameConstants.ENEMY) {
                 scene.time.addEvent({
                     delay: enemy.timeBeforAppear,
                     callback: () => {
@@ -88,22 +88,12 @@ export class LevelEngine {
     }
 
     protected createAstroids(scene: Phaser.Scene) {
-        for (let i = 0; i < this._levelFactory.getAmountOfAstroids(); i++) {
-            let x = Math.random() * scene.cameras.main.width;
-            let y = Math.random() * scene.cameras.main.height;
-            const centerX = scene.cameras.main.width / 2;
-            const centerY = scene.cameras.main.height / 2;
-            const distanceFromCenter = 200;
-
-            if (Math.abs(x - centerX) < distanceFromCenter && Math.abs(y - centerY) < distanceFromCenter) {
-                i--;
-                continue;
-            }
-
-            x = Math.round(x / 10) * 10;
-            y = Math.round(y / 10) * 10;    
-
-            const astroid = new Astroid(scene, x, y, "astroid" + i, 3);
+        let astroids = this._levelFactory.getAstroids();
+        for (let i = 0; i < astroids.length; i++) {
+            const x = astroids[i].x;
+            const y = astroids[i].y
+            const speed = astroids[i].enemySpeed;
+            const astroid = new Astroid(scene, x, y, "astroid" + i, 3, speed);
             this._astroids.add(astroid);
         }
     }
@@ -112,20 +102,21 @@ export class LevelEngine {
         const sizeType = (astroid as Astroid).sizeType;
         const position = new Phaser.Math.Vector2(astroid.x, astroid.y);
         const astroidID = (astroid as Astroid).id;
+        const astroidSpeed = (astroid as Astroid).speed;
 
         this._uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: sizeType });
 
         astroid.destroy();
         if (sizeType > 1) {
-            this.createSmallerEnemies.call(this, sizeType, position, astroidID);
+            this.createSmallerEnemies.call(this, sizeType, position, astroidID, astroidSpeed);
         }
     }
 
-    protected createSmallerEnemies(this: LevelEngine, sizeType: number, position: Phaser.Math.Vector2, parentID: string) {
+    protected createSmallerEnemies(this: LevelEngine, sizeType: number, position: Phaser.Math.Vector2, parentID: string, speed: number) {
         const newSizeType = sizeType - 1;
         const newEnemies = 2;
         for (let i = 0; i < newEnemies; i++) {
-            const newAstroid = new Astroid(this._currentScene, position.x, position.y, parentID + "-" + i, newSizeType);
+            const newAstroid = new Astroid(this._currentScene, position.x, position.y, parentID + "-" + i, newSizeType, speed);
             this._astroids.add(newAstroid);
         }
     }
@@ -153,10 +144,13 @@ export class LevelEngine {
      */
     protected addShipColliders() {
         this._currentScene.physics.add.collider(this._bullets, this._ship, (bullet, ship) => {
-            bullet.destroy();
-            ship.destroy();
-            this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
-            this.createExplosion(ship as Phaser.GameObjects.Sprite, GameConstants.PLAYER);
+            //Check if the bullet is a player bullet
+            if ((bullet as Bullet).bulletType === Bullet.ENEMY) {
+                bullet.destroy();
+                ship.destroy();
+                this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
+                this.createExplosion(ship as Phaser.GameObjects.Sprite, GameConstants.PLAYER);
+            }
         }, undefined, this._currentScene);
 
         this._currentScene.physics.add.collider(this._ship, this._astroids, (ship, astroid) => {

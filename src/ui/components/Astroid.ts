@@ -13,13 +13,13 @@ export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
     private _thickness: number;
     private _sizeType: number = 0;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, id: string, sizeType: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, id: string, sizeType: number, speed: number) {
         super(scene, x, y, id);
         this._id = id;
         this._sizeType = sizeType
         this._scaleFactor = Math.pow(2, sizeType);
         this.scene = scene;
-        this.speed = 10;//80;
+        this.speed = speed;
         this._thickness = 2;
         this._angle = Math.random() * Math.PI * 2;
 
@@ -59,6 +59,10 @@ export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
 
     set id(id: string) {
         this._id = id;
+    }
+
+    get speed(): number {
+        return this.speed;
     }
 
     protected create() {
