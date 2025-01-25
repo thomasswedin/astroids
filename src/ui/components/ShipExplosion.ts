@@ -4,7 +4,7 @@
 // the explosion effect will be created when the ship collides with an astroid
 import Phaser from 'phaser';
 
-export class Explosion extends Phaser.GameObjects.Sprite {
+export class ShipExplosion extends Phaser.GameObjects.Sprite {
 
     private _scaleFactor = 1.5;
     private _debug: boolean = false;

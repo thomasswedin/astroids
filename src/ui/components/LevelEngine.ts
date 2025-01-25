@@ -4,16 +4,18 @@ import { UIEventManager } from "../events/ui/UIEventManager";
 import { Astroid } from './Astroid';
 import { Bullet } from './Bullet';
 import { EnemyShip } from './EnemyShip';
-import { Explosion } from './Explosion';
+import { EnemyShipExplosion } from './EnemyShipExplosion';
 import { LevelFactory } from './LevelFactory';
 import { Ship } from "./Ship";
+import { ShipExplosion } from './ShipExplosion';
 
 export class LevelEngine {
 
     protected _currentScene: Phaser.Scene;
     protected _levelFactory!: LevelFactory;
     protected _ship!: Ship;
-    protected _explosion!: Explosion;
+    protected _shipExplosion!: ShipExplosion;
+    protected _enemyExplosion!: EnemyShipExplosion;
     protected _astroids!: Phaser.GameObjects.Group;
     protected _bullets!: Phaser.GameObjects.Group;
     protected _enemies!: Phaser.GameObjects.Group;
@@ -151,34 +153,25 @@ export class LevelEngine {
      */
     protected addShipColliders() {
         this._currentScene.physics.add.collider(this._bullets, this._ship, (bullet, ship) => {
-            console.log('Collision detected between ship and bullet');
-            const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
-            const angle = (ship as Phaser.GameObjects.Sprite).angle;
             bullet.destroy();
             ship.destroy();
             this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
-
-            this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
+            this.createExplosion(ship as Phaser.GameObjects.Sprite, 'ship');
         }, undefined, this._currentScene);
 
         this._currentScene.physics.add.collider(this._ship, this._astroids, (ship, astroid) => {
-            console.log('Collision detected between ship and astroid');
-            const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
-            const angle = (ship as Phaser.GameObjects.Sprite).angle;
             ship.destroy();
             this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
 
-            this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
+            this.createExplosion(ship as Phaser.GameObjects.Sprite, 'ship');
             this.manageHitAstroid(astroid as Phaser.GameObjects.Sprite);
         }, undefined, this._currentScene);
 
         this._currentScene.physics.add.collider(this._ship, this._enemies, (ship, enemy) => {
-            const position = new Phaser.Math.Vector2((ship as Phaser.GameObjects.Sprite).x, (ship as Phaser.GameObjects.Sprite).y);
-            const angle = (ship as Phaser.GameObjects.Sprite).angle;
             ship.destroy();
             this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
-
-            this._explosion = new Explosion(this._currentScene, position.x, position.y, angle);
+            this.createExplosion(ship as Phaser.GameObjects.Sprite, 'ship');
+            this.createExplosion(enemy as Phaser.GameObjects.Sprite, 'enemy');
             enemy.destroy();
         }, undefined, this._currentScene);
     }
@@ -201,9 +194,22 @@ export class LevelEngine {
 
         this._currentScene.physics.add.collider(this._bullets, this._enemies, (bullet, enemy) => {
             if ((bullet as Bullet).bulletType === Bullet.PLAYER) {
-                enemy.destroy();
+                this.createExplosion(enemy as Phaser.GameObjects.Sprite, 'enemy');
                 bullet.destroy();
             }
         }, undefined, this._currentScene);
     }
+
+    protected createExplosion(object: Phaser.GameObjects.Sprite, explosionType: string) {
+        const enemyPosition = new Phaser.Math.Vector2((object as Phaser.GameObjects.Sprite).x, (object as Phaser.GameObjects.Sprite).y);
+        const angle = (object as Phaser.GameObjects.Sprite).angle;
+        if (explosionType === 'ship') {
+            new ShipExplosion(this._currentScene, enemyPosition.x, enemyPosition.y, angle);
+        } else if (explosionType === 'enemy') {
+            new EnemyShipExplosion(this._currentScene, enemyPosition.x, enemyPosition.y, angle);
+        }
+        object.destroy();
+    }
+
+
 }
