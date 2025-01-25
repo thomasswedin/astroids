@@ -3,7 +3,7 @@ import type { IGameObject } from './IGameObject';
 
 export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
 
-    private speed: number;
+    private _speed: number;
     private _scaleFactor = 8;
     private _id: string;
     private _angle: number;
@@ -19,7 +19,7 @@ export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
         this._sizeType = sizeType
         this._scaleFactor = Math.pow(2, sizeType);
         this.scene = scene;
-        this.speed = speed;
+        this._speed = speed;
         this._thickness = 2;
         this._angle = Math.random() * Math.PI * 2;
 
@@ -62,7 +62,7 @@ export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
     }
 
     get speed(): number {
-        return this.speed;
+        return this._speed;
     }
 
     protected create() {
