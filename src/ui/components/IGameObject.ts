@@ -3,4 +3,5 @@ export interface IGameObject {
     id: string;
     sizeType: number;
     speed: number;
+    targetPos: Phaser.Math.Vector2;
 }

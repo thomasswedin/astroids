@@ -4,7 +4,6 @@ import { Bullet } from './Bullet';
 import type { IGameObject } from './IGameObject';
 
 export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject {
-  private target: Phaser.GameObjects.Sprite;
   private _widthOfShipTexture: number;
   private _heightOfShipTexture: number;
   private enemyShipTextureKey: string = "enemyShipTextureKey";
@@ -12,20 +11,21 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
   private shootCounter = 0;
   private _id: string;
   private _sizeType: number = 0;
+  private _targetPos: Phaser.Math.Vector2;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Phaser.GameObjects.Sprite, id: string, sizeType: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, id: string, sizeType: number) {
     super(scene, x, y, "enemy_ship");
     this._id = id;
     this._sizeType = sizeType
     this.scene = scene;
-    this.target = target;
+    this._targetPos = new Phaser.Math.Vector2();
 
     this._widthOfShipTexture = 32;
     this._heightOfShipTexture = 32;
     this.create();
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
-    this.scene.physics.moveToObject(this, this.target, 100);
+    //this.scene.physics.moveToObject(this, this.target, 100);
     this.scene.physics.moveTo(this, 800, y, 100);
   }
 
@@ -49,8 +49,16 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
     this._id = id;
   }
 
-  get speed(): number { 
+  get speed(): number {
     return 100;
+  }
+
+  set targetPos(targetPos: Phaser.Math.Vector2) {
+    this._targetPos = targetPos;
+  }
+
+  get targetPos(): Phaser.Math.Vector2 {  
+    return this._targetPos;
   }
 
   protected create() {
@@ -60,8 +68,8 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
   }
 
   private shoot(): void {
-    // Depending on the angle to the target, the enemy ship will shoot a bullet in that direction.
-    const angleInRadians = Phaser.Math.Angle.BetweenPoints(this.getCenter(), this.target.getCenter());
+    let enemyShipCenter = this.getCenter();
+    const angleInRadians = Phaser.Math.Angle.BetweenPoints(enemyShipCenter, this._targetPos);
     const bulletX = this.x + Math.cos(angleInRadians) * this._heightOfShipTexture / 2;
     const bulletY = this.y + Math.sin(angleInRadians) * this._heightOfShipTexture / 2;
     const bullet = new Bullet(this.scene, bulletX, bulletY, Phaser.Math.RadToDeg(angleInRadians), Bullet.ENEMY);

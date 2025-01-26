@@ -60,7 +60,7 @@ export class LevelEngine {
                 scene.time.addEvent({
                     delay: enemy.timeBeforAppear,
                     callback: () => {
-                        this._enemies.add(new EnemyShip(scene, enemy.x, enemy.y, this._ship, "enemy", 3));
+                        this._enemies.add(new EnemyShip(scene, enemy.x, enemy.y, "enemy", 3));
                     },
                     callbackScope: this
                 });
@@ -79,6 +79,15 @@ export class LevelEngine {
         if (this._ship) {
             this._ship.update();
         }
+
+        if (this._enemies) {
+            this._enemies.getChildren().forEach((enemy) => {
+                if (this._ship && this._ship.getCenter()) {
+                    let targetPostion = this._ship.getCenter() as Phaser.Math.Vector2;
+                    (enemy as EnemyShip).targetPos = targetPostion;
+                }
+            });
+        }
     }
 
 
@@ -92,7 +101,7 @@ export class LevelEngine {
         for (let i = 0; i < astroids.length; i++) {
             const x = astroids[i].x;
             const y = astroids[i].y
-            const speed = astroids[i].enemySpeed;
+            const speed = astroids[i].speed;
             const astroid = new Astroid(scene, x, y, "astroid" + i, 3, speed);
             this._astroids.add(astroid);
         }
@@ -147,9 +156,9 @@ export class LevelEngine {
             //Check if the bullet is a player bullet
             if ((bullet as Bullet).bulletType === Bullet.ENEMY) {
                 bullet.destroy();
+                this.createExplosion(ship as Phaser.GameObjects.Sprite, GameConstants.PLAYER);
                 ship.destroy();
                 this._uiEventManager.dispatchEvent(GameEvents.ShipCollisionEvent);
-                this.createExplosion(ship as Phaser.GameObjects.Sprite, GameConstants.PLAYER);
             }
         }, undefined, this._currentScene);
 
