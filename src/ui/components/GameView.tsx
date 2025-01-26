@@ -9,6 +9,7 @@ import { Background } from "./Background";
 import { LevelEngine } from './LevelEngine';
 import { LevelFactory } from './LevelFactory';
 import { LivesPanel } from './LivesPanel';
+import { TileTextComponent } from './TileTextComponent/TileTextComponent';
 
 export default defineComponent({
   name: 'GameView',
@@ -57,6 +58,8 @@ export default defineComponent({
         livesPanel = new LivesPanel(currentScene, currentScene.cameras.main.width - 100, 0);
         levelFactory = new LevelFactory(currentScene, 3);
         levelEngine = new LevelEngine(currentScene, levelFactory, uiEventManager);
+        new TileTextComponent(currentScene, 300, 100, 'ASTROIDS');
+        new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
 
         levelEngine.create();
         uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
@@ -83,7 +86,7 @@ export default defineComponent({
       } else {
         gameOver.value = true;
         levelEngine.gameOver();
-      } 
+      }
     });
 
     return () => (
