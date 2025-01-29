@@ -14,10 +14,10 @@ export class TileTextComponent extends Phaser.GameObjects.Sprite {
         const textArray = text.split('');
         let x = this.x;
         let delay = 0;
-        const textStyle = { fontSize: '48px', fontFamily: 'Courier New', color: '#FFFFFF', align: 'center' };
+        const textStyle = { fontSize: '28px', fontFamily: 'Hyperspace', color: '#FFFFFF', align: 'center'};
 
         textArray.forEach((character) => {
-            const textObject = new Phaser.GameObjects.Text(this.scene, x, this.y, this.getRandomCharacter(), textStyle);
+            const textObject = new Phaser.GameObjects.Text(this.scene, x, this.y, this.getRandomCharacter(true), textStyle);
             this.scene.add.existing(textObject);
 
             for (let j = 0; j <= 10; j++) {
@@ -29,13 +29,17 @@ export class TileTextComponent extends Phaser.GameObjects.Sprite {
                 });
             }
 
-            x += textObject.width;
+            x += 28;
+            console.log('X: ' + x);
             delay += 50;
         });
     }
 
-    protected getRandomCharacter(): string {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ';
+    protected getRandomCharacter(isStartCharacter: boolean = false): string {
+        //How to type backslash on mac keyboard?
+
+
+        const characters = isStartCharacter ? "/\\" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
         return characters.charAt(Math.floor(Math.random() * characters.length));
     }
 }

@@ -39,6 +39,7 @@ export default defineComponent({
           }
         },
         scene: {
+          preload: preload,
           create: create,
           update: update,
         },
@@ -52,14 +53,18 @@ export default defineComponent({
 
       new Phaser.Game(config);
 
+      function preload(this: Phaser.Scene) {
+        //this.load.font('Vectorb', 'assets/fonts/Vectorb1.ttf');
+      }
+
       function create(this: Phaser.Scene) {
         currentScene = this;
         new Background(currentScene, 0, 0);
         livesPanel = new LivesPanel(currentScene, currentScene.cameras.main.width - 100, 0);
         levelFactory = new LevelFactory(currentScene, 3);
         levelEngine = new LevelEngine(currentScene, levelFactory, uiEventManager);
-        new TileTextComponent(currentScene, 300, 100, 'ASTROIDS');
-        new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
+        new TileTextComponent(currentScene, 300, 26, 'ASTROIDS');
+        //new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
 
         levelEngine.create();
         uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);

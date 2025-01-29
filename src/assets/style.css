@@ -15,6 +15,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: Vectorb;
+  src: url('fonts/Vectorb.ttf');
+  font-weight:normal;
+}
+
+@font-face {
+  font-family: Hyperspace;
+  src: url('fonts/Hyperspace Bold.otf');
+}
+
 a {
   font-weight: 500;
   color: #646cff;
