@@ -6,17 +6,17 @@ import Phaser from 'phaser';
 
 export class AstroidsExplosion extends Phaser.GameObjects.Sprite {
 
-    private _scaleFactor = 1.5;
+    //private _scaleFactor = 1.5;
     private _debug: boolean = false;
     private _angle: number;
     private _asteroidPoints: { x: number, y: number }[] = [];
 
-    constructor(scene: Phaser.Scene, x: number, y: number, angle: number, id: string = 'explosion', _asteroidPoints) {
+    constructor(scene: Phaser.Scene, x: number, y: number, angle: number, id: string = 'explosion', asteroidPoints: { x: number, y: number }[]) {
         super(scene, x, y, id);
         this.scene = scene;
         this._angle = angle;
         new Phaser.GameObjects.Container(this.scene);
-        this._asteroidPoints = _asteroidPoints;
+        this._asteroidPoints = asteroidPoints;
 
 
         this._debug ? this.drawSurroundedBox() : null;
