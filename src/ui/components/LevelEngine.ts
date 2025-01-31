@@ -9,6 +9,7 @@ import { EnemyShipExplosion } from './EnemyShipExplosion';
 import { LevelFactory } from './LevelFactory';
 import { Ship } from "./Ship";
 import { ShipExplosion } from './ShipExplosion';
+import { AstroidsExplosion } from './AstroidsExplosion';
 
 export class LevelEngine {
 
@@ -17,6 +18,7 @@ export class LevelEngine {
     protected _ship!: Ship;
     protected _shipExplosion!: ShipExplosion;
     protected _enemyExplosion!: EnemyShipExplosion;
+    protected _astroidsExplosion!: AstroidsExplosion;
     protected _astroids!: Phaser.GameObjects.Group;
     protected _bullets!: Phaser.GameObjects.Group;
     protected _enemies!: Phaser.GameObjects.Group;
@@ -114,7 +116,7 @@ export class LevelEngine {
         const astroidSpeed = (astroid as Astroid).speed;
 
         this._uiEventManager.dispatchEvent(GameEvents.HitEvent, { enemy: sizeType });
-
+        this.createAstroidExplosion(astroid as Phaser.GameObjects.Sprite, GameConstants.ASTROID);
         astroid.destroy();
         if (sizeType > 1) {
             this.createSmallerEnemies.call(this, sizeType, position, astroidID, astroidSpeed);
@@ -210,6 +212,15 @@ export class LevelEngine {
             new ShipExplosion(this._currentScene, enemyPosition.x, enemyPosition.y, angle);
         } else if (explosionType === GameConstants.ENEMY) {
             new EnemyShipExplosion(this._currentScene, enemyPosition.x, enemyPosition.y, angle);
+        } 
+        object.destroy();
+    }
+
+    protected createAstroidExplosion(object: Phaser.GameObjects.Sprite, explosionType: string) {
+        const enemyPosition = new Phaser.Math.Vector2((object as Phaser.GameObjects.Sprite).x, (object as Phaser.GameObjects.Sprite).y);
+        const angle = (object as Phaser.GameObjects.Sprite).angle;
+        if (explosionType === GameConstants.ASTROID) {
+            new AstroidsExplosion(this._currentScene, enemyPosition.x, enemyPosition.y, angle, 'explosion', (object as Astroid).getAsteroidPoints);
         }
         object.destroy();
     }

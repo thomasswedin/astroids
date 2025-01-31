@@ -31,7 +31,7 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
 
   update(): void {
     this.shootCounter++;
-    if (this.shootCounter >= 100) {
+    if (this.shootCounter >= 300) {
       this.shoot();
       this.shootCounter = 0;
     }

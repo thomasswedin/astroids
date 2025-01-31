@@ -48,7 +48,7 @@ export class LevelFactory {
                 //Create IAstroidData objects
                 for (let i = 0; i < 4; i++) {
                     const astroidPosition = this.calculateAstroidsStartPosition();
-                    this._astroids.push({ x: astroidPosition.x, y: astroidPosition.y, speed: 10}); //100
+                    this._astroids.push({ x: astroidPosition.x, y: astroidPosition.y, speed: 100}); //100
                 }
                 //this._enemies.push({ timeBeforAppear: 1000, enemyType: GameConstants.ENEMY, x: -120, y: this._currentScene.cameras.main.height - this._currentScene.cameras.main.height / 4, enemySpeed: 100});
                 this._enemies.push({ timeBeforAppear: 4000, enemyType: GameConstants.ENEMY, x: -120, y: this._currentScene.cameras.main.height / 4, enemySpeed: 100});
