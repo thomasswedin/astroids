@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { GameConstants } from '../constants/GameConstants';
-import { Bullet } from './Bullet';
+import { GameConstants } from '../../constants/GameConstants';
+import { Bullet } from '../Bullet';
 
 export class Ship extends Phaser.GameObjects.Sprite {
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
