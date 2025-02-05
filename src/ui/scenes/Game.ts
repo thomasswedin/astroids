@@ -1,5 +1,6 @@
 import { UIDataManager } from "../../ui/data/UIDataManager";
 import { Background } from '../components/Background';
+import { MKeypad } from "../components/keypad/mobile/MKeypad";
 import { LevelEngine } from '../components/LevelEngine';
 import { LevelFactory } from '../components/LevelFactory';
 import { LivesPanel } from '../components/LivesPanel';
@@ -14,6 +15,7 @@ export class Game extends Phaser.Scene {
     protected _uiEventManager!: UIEventManager;
     protected _livesPanel!: LivesPanel;
     protected _uiDataManager!: UIDataManager;
+    protected _keypad!: MKeypad;
 
     constructor() {
         super({
@@ -29,7 +31,9 @@ export class Game extends Phaser.Scene {
         this._levelFactory = new LevelFactory(this, 3);
         this._levelEngine = new LevelEngine(this, this._levelFactory, this._uiEventManager);
         this._livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0);
-
+        
+        this._keypad = new MKeypad(this, 200, 560);
+        
         new TileTextComponent(this, 300, 26, 'ASTROIDS');
         //new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
 
@@ -38,7 +42,7 @@ export class Game extends Phaser.Scene {
         } else {
             throw new Error('LevelEngine is not initialized');
         }
-        
+
         this.addEventListeners();
         this._uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
     }

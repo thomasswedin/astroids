@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 import { defineComponent, inject, onMounted, ref, watch } from 'vue';
 import type { IUIServices } from '../../UIController';
 import { servicesKey } from '../../UIController';
@@ -41,6 +42,11 @@ export default defineComponent({
 
     //https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scalemanager/
     //https://docs.phaser.io/api-documentation/class/scale-scalemanager
+
+    //width: 1280, // Adjusted width for smaller size
+    //height: 720, // Adjusted height for smaller size
+    //width: 1920,
+    //height: 1080,
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
@@ -54,11 +60,27 @@ export default defineComponent({
           }
         },
         scene: [Preloader, Menu, Game],
+        scale: {
+          mode: Phaser.Scale.FIT,
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+          width: 1280,
+          height: 720,
+          fullscreenTarget: 'game-container'
+        },
         input: {
           keyboard: true,
           mouse: true,
           touch: true,
           gamepad: true
+        },
+        plugins: {
+          global: [{
+            key: 'rexVirtualJoystick',
+            plugin: VirtualJoystickPlugin,
+            start: true
+          },
+            // ...
+          ]
         },
         callbacks: {
           preBoot: (game) => {

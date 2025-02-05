@@ -11,7 +11,8 @@
   "dependencies": {
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "phaser": "^3.87.0",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "phaser3-rex-plugins": "1.80.13"
   },
   "devDependencies": {
     "reflect-metadata": "^0.1.13",
