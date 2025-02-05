@@ -7,7 +7,6 @@ import { UIEventManager } from "../events/ui/UIEventManager";
 import { Game } from '../scenes/Game';
 import { Menu } from '../scenes/Menu';
 import { Preloader } from '../scenes/Preloader';
-import { LivesPanel } from './LivesPanel';
 
 
 export default defineComponent({
@@ -20,7 +19,6 @@ export default defineComponent({
     const services: IUIServices = inject(servicesKey) as IUIServices;
     const uiEventManager: UIEventManager = services.uiEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
-    let livesPanel: LivesPanel;
 
 
     let game: Phaser.Game;
@@ -28,10 +26,7 @@ export default defineComponent({
 
 
     const onChangeScreen = () => {
-      //_game.scale.resize(window.innerWidth, window.innerHeight);
-      if (game.scene.scenes.length > 0) {
-        //(_currentScene as any).resize();
-      }
+      //Get current scene and update the screen size
     }
 
     const _orientation = screen.orientation || (screen as any).mozOrientation || (screen as any).msOrientation;
@@ -43,6 +38,9 @@ export default defineComponent({
       onChangeScreen();
     });
 
+
+    //https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scalemanager/
+    //https://docs.phaser.io/api-documentation/class/scale-scalemanager
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
@@ -71,30 +69,20 @@ export default defineComponent({
 
       game = new Phaser.Game(config);
       game.scene.start('Preloader', { services });
-      /*function update() {
-        if (levelEngine) {
-          levelEngine.update();
-        }
-      }*/
     });
 
     watch(uiDataManager.game.score.ref, (newValue) => {
       score.value = newValue;
-      //livesPanel.setScore(newValue);
       game.scene.getScene('Game').events.emit('updateScore', newValue);
     });
-    
+
     watch(uiDataManager.game.lives.ref, (newValue) => {
       lives.value = newValue;
 
-      //livesPanel.setLives(newValue);
-
       if (newValue > 0) {
         game.scene.getScene('Game').events.emit('updateLives', newValue);
-        //levelEngine.newLife(_currentScene);
       } else {
         gameOver.value = true;
-        //levelEngine.gameOver();
       }
     });
 

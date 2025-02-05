@@ -19,62 +19,17 @@ export class Game extends Phaser.Scene {
         super({
             key: 'Game'
         });
-        // Access services from the registry
-
     }
-
-    /*init(data: { services: IUIServices }) {
-        this._uiEventManager = data.services.uiEventManager;
-        this._uiDataManager = data.services.dataManager;
-    }*/
-
-    //How to covert this to ts
-    /*watch(uiDataManager.game.lives.ref, (newValue) => {
-          lives.value = newValue;
-          livesPanel.setLives(newValue);
-    
-          if (newValue > 0) {
-            //levelEngine.newLife(_currentScene);
-          } else {
-            gameOver.value = true;
-            //levelEngine.gameOver();
-          }
-        });*/
-
 
     create() {
         this._uiEventManager = this.registry.get('services').uiEventManager;
         this._uiDataManager = this.registry.get('services').dataManager;
-
-        /*if (typeof this._uiDataManager.game.lives.ref.subscribe === 'function') {
-            this._uiDataManager.game.lives.ref.subscribe((newValue: number) => {
-            this._livesPanel.setLives(newValue);
-
-            if (newValue > 0) {
-                this._levelEngine.newLife(this);
-            } else {
-                //gameOver.value = true;
-                this._levelEngine.gameOver();
-            }
-            });
-        } else {
-            console.error('this._uiDataManager.game.lives.ref.subscribe is not a function');
-        }*/
 
         new Background(this, 0, 0);
         this._levelFactory = new LevelFactory(this, 3);
         this._levelEngine = new LevelEngine(this, this._levelFactory, this._uiEventManager);
         this._livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0);
 
-        if (this._uiEventManager) {
-            if (this._levelFactory) {
-
-            } else {
-                throw new Error('LevelFactory is not initialized');
-            }
-        } else {
-            throw new Error('UIEventManager is not initialized');
-        }
         new TileTextComponent(this, 300, 26, 'ASTROIDS');
         //new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
 
@@ -84,27 +39,32 @@ export class Game extends Phaser.Scene {
             throw new Error('LevelEngine is not initialized');
         }
         
-
-        // Request fullscreen mode
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-        } else if (document.documentElement.requestFullscreen) { // Chrome, Firefox, Safari, and Opera
-            document.documentElement.requestFullscreen();
-        }
-
-        this.events.on('updateLives', this.handleUpdateLives, this);
+        this.addEventListeners();
         this._uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
     }
-  
-    handleUpdateLives(newValue: number) {
-      // Handle the new lives value here
-      console.log('New lives value:', newValue);
-      // Update your game logic based on the new lives value
-      this._levelEngine.newLife(this);
+
+    update(): void {
+        if (this._levelEngine) {
+            this._levelEngine.update();
+        }
     }
 
-    public newLife() {
-        //To be implemented
-        this._levelEngine.newLife(this);
+    protected addEventListeners() {
+        this.events.on('updateLives', this.onUpdateLives, this);
+        this.events.on('updateScore', this.onUpdateScore, this);
+    }
+
+    protected onUpdateLives(newValue: number) {
+        this._livesPanel.setLives(newValue);
+
+        if (newValue > 0) {
+            this._levelEngine.newLife(this);
+        } else {
+            this._levelEngine.gameOver();
+        }
+    }
+
+    protected onUpdateScore(newValue: number) {
+        this._livesPanel.setScore(newValue);
     }
 }
