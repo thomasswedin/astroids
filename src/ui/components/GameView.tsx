@@ -1,15 +1,14 @@
 import Phaser from 'phaser';
+import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoystick-plugin.js';
 import { defineComponent, inject, onMounted, ref, watch } from 'vue';
 import type { IUIServices } from '../../UIController';
 import { servicesKey } from '../../UIController';
 import { UIDataManager } from "../data/UIDataManager";
-import { GameEvents } from '../events/game/GameEvents';
 import { UIEventManager } from "../events/ui/UIEventManager";
-import { Background } from "./Background";
-import { LevelEngine } from './LevelEngine';
-import { LevelFactory } from './LevelFactory';
-import { LivesPanel } from './LivesPanel';
-import { TileTextComponent } from './TileTextComponent/TileTextComponent';
+import { Game } from '../scenes/Game';
+import { Menu } from '../scenes/Menu';
+import { Preloader } from '../scenes/Preloader';
+
 
 export default defineComponent({
   name: 'GameView',
@@ -21,11 +20,33 @@ export default defineComponent({
     const services: IUIServices = inject(servicesKey) as IUIServices;
     const uiEventManager: UIEventManager = services.uiEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
-    let livesPanel: LivesPanel;
-    let currentScene: Phaser.Scene;
-    let levelFactory: LevelFactory;
-    let levelEngine: LevelEngine;
 
+
+    let game: Phaser.Game;
+
+
+
+    const onChangeScreen = () => {
+      //Get current scene and update the screen size
+    }
+
+    const _orientation = screen.orientation || (screen as any).mozOrientation || (screen as any).msOrientation;
+    _orientation.addEventListener('change', () => {
+      onChangeScreen();
+    });
+
+    window.addEventListener('resize', () => {
+      onChangeScreen();
+    });
+
+
+    //https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scalemanager/
+    //https://docs.phaser.io/api-documentation/class/scale-scalemanager
+
+    //width: 1280, // Adjusted width for smaller size
+    //height: 720, // Adjusted height for smaller size
+    //width: 1920,
+    //height: 1080,
     onMounted(() => {
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
@@ -34,63 +55,56 @@ export default defineComponent({
         physics: {
           default: 'arcade',
           arcade: {
-        gravity: { x: 0, y: 0 },
-        debug: false
+            gravity: { x: 0, y: 0 },
+            debug: false
           }
         },
-        scene: {
-          preload: preload,
-          create: create,
-          update: update,
+        scene: [Preloader, Menu, Game],
+        scale: {
+          mode: Phaser.Scale.FIT,
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+          width: 1280,
+          height: 720,
+          fullscreenTarget: 'game-container'
         },
         input: {
           keyboard: true,
           mouse: true,
           touch: true,
           gamepad: true
+        },
+        plugins: {
+          global: [{
+            key: 'rexvirtualjoystickplugin',
+            plugin: VirtualJoystickPlugin,
+            start: true
+          },
+            // ...
+          ]
+        },
+        callbacks: {
+          preBoot: (game) => {
+            game.registry.set('services', services);
+          }
         }
       };
 
-      new Phaser.Game(config);
-
-      function preload(this: Phaser.Scene) {
-        //this.load.font('Vectorb', 'assets/fonts/Vectorb1.ttf');
-      }
-
-      function create(this: Phaser.Scene) {
-        currentScene = this;
-        new Background(currentScene, 0, 0);
-        livesPanel = new LivesPanel(currentScene, currentScene.cameras.main.width - 100, 0);
-        levelFactory = new LevelFactory(currentScene, 3);
-        levelEngine = new LevelEngine(currentScene, levelFactory, uiEventManager);
-        new TileTextComponent(currentScene, 300, 26, 'ASTROIDS');
-        //new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
-
-        levelEngine.create();
-        uiEventManager.dispatchEvent(GameEvents.GameSetupComplete);
-      }
-
-      function update() {
-        if (levelEngine) {
-          levelEngine.update();
-        }
-      }
+      game = new Phaser.Game(config);
+      game.scene.start('Preloader', { services });
     });
 
     watch(uiDataManager.game.score.ref, (newValue) => {
       score.value = newValue;
-      livesPanel.setScore(newValue);
+      game.scene.getScene('Game').events.emit('updateScore', newValue);
     });
 
     watch(uiDataManager.game.lives.ref, (newValue) => {
       lives.value = newValue;
-      livesPanel.setLives(newValue);
 
       if (newValue > 0) {
-        levelEngine.newLife(currentScene);
+        game.scene.getScene('Game').events.emit('updateLives', newValue);
       } else {
         gameOver.value = true;
-        levelEngine.gameOver();
       }
     });
 

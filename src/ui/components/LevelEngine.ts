@@ -2,14 +2,14 @@ import Phaser from 'phaser';
 import { GameConstants } from '../constants/GameConstants';
 import { GameEvents } from '../events/game/GameEvents';
 import { UIEventManager } from "../events/ui/UIEventManager";
-import { Astroid } from './Astroid';
+import { Astroid } from './astroids/Astroid';
+import { AstroidsExplosion } from './astroids/AstroidsExplosion';
 import { Bullet } from './Bullet';
-import { EnemyShip } from './EnemyShip';
-import { EnemyShipExplosion } from './EnemyShipExplosion';
+import { EnemyShip } from './enemies/EnemyShip';
+import { EnemyShipExplosion } from './enemies/EnemyShipExplosion';
 import { LevelFactory } from './LevelFactory';
-import { Ship } from "./Ship";
-import { ShipExplosion } from './ShipExplosion';
-import { AstroidsExplosion } from './AstroidsExplosion';
+import { Ship } from "./player/Ship";
+import { ShipExplosion } from './player/ShipExplosion';
 
 export class LevelEngine {
 
@@ -91,7 +91,6 @@ export class LevelEngine {
             });
         }
     }
-
 
     public newLife(scene: Phaser.Scene) {
         this._ship = new Ship(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2);

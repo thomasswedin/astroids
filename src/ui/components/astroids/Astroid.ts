@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { IGameObject } from './IGameObject';
+import type { IGameObject } from '../IGameObject';
 
 export class Astroid extends Phaser.GameObjects.Sprite implements IGameObject {
 

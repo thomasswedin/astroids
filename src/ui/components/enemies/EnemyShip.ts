@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { GameConstants } from '../constants/GameConstants';
-import { Bullet } from './Bullet';
-import type { IGameObject } from './IGameObject';
+import { GameConstants } from '../../constants/GameConstants';
+import { Bullet } from '../Bullet';
+import type { IGameObject } from '../IGameObject';
 
 export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject {
   private _widthOfShipTexture: number;
@@ -34,6 +34,10 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
     if (this.shootCounter >= 300) {
       this.shoot();
       this.shootCounter = 0;
+    }
+
+    if (this.x > this.scene.cameras.main.width + 100) {
+      this.destroy();
     }
   }
 
@@ -129,7 +133,6 @@ export class EnemyShip extends Phaser.GameObjects.Sprite implements IGameObject 
     //Calculate the Modulo of minX and maxX
     const moduloX = Math.abs((Math.abs(maxX) + minX)) / 2;
     const moduloY = Math.abs((Math.abs(maxY) + minY)) / 2;
-
 
     // Calculate the offset to center the ship
     const offsetX = this._widthOfShipTexture / 2 + moduloX;

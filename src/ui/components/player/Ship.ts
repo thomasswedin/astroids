@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { GameConstants } from '../constants/GameConstants';
-import { Bullet } from './Bullet';
+import { GameConstants } from '../../constants/GameConstants';
+import { Bullet } from '../Bullet';
 
 export class Ship extends Phaser.GameObjects.Sprite {
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -16,6 +16,8 @@ export class Ship extends Phaser.GameObjects.Sprite {
     private _debug: boolean = false;
     private lastShotTime: number | undefined;
     private _hyperModeActive: boolean = false;
+    private _currentJoystickState: string;
+    private _currentJoystickFireButtonState: string;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'ship');
@@ -27,6 +29,9 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this._debug ? this.drawCenterCross() : null;
         this.create();
         this._debug ? this.drawSurroundedBox() : null;
+
+        this._currentJoystickFireButtonState = GameConstants.FIRE_BUTTON_UP;
+        this._currentJoystickState = GameConstants.JOYSTICK_NONE;
 
         // Disable debug rendering for the ship's body
         if (this.body instanceof Phaser.Physics.Arcade.Body) {
@@ -41,7 +46,22 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
         this.scene.physics.world.enable(this);
+        this.addEventListeners();
+    }
 
+    protected addEventListeners() {
+        this.scene.events.on(GameConstants.FIRE_BUTTON_EVENT, this.onFireButtonAction, this);
+        this.scene.events.on(GameConstants.JOYSTICK_EVENT, this.onJoystickAction, this);
+    }
+
+    protected onJoystickAction(action: string) {
+        console.log(action);
+        this._currentJoystickState = action;
+    }
+
+    protected onFireButtonAction(action: string) {
+        console.log(action);
+        this._currentJoystickFireButtonState = action;
     }
 
     update(): void {
@@ -50,6 +70,14 @@ export class Ship extends Phaser.GameObjects.Sprite {
         this.shootingCheck();
         this._hyperModeCheck();
         this.gamepadButtonControlConsoleLog();
+    }
+
+    public jockStickAction(action:string): void {
+        console.log(action);
+    }
+
+    public fireButtonAction(action:string): void {  
+        console.log(action);
     }
 
     protected create() {
@@ -191,9 +219,9 @@ export class Ship extends Phaser.GameObjects.Sprite {
 
         const gamepad = this.scene.input.gamepad && this.scene.input.gamepad.total ? this.scene.input.gamepad.getPad(0) : undefined;
 
-        const upPressed = this.cursors.up?.isDown || gamepad?.buttons[7].pressed;
-        const leftPressed = this.cursors.left?.isDown || gamepad?.buttons[14].pressed;
-        const rightPressed = this.cursors.right?.isDown || gamepad?.buttons[15].pressed;
+        const upPressed = this.cursors.up?.isDown || gamepad?.buttons[7].pressed || this._currentJoystickState === GameConstants.JOYSTICK_UP;
+        const leftPressed = this.cursors.left?.isDown || gamepad?.buttons[14].pressed || this._currentJoystickState === GameConstants.JOYSTICK_LEFT;
+        const rightPressed = this.cursors.right?.isDown || gamepad?.buttons[15].pressed || this._currentJoystickState === GameConstants.JOYSTICK_RIGHT;
 
         if (upPressed) {
             const angleInRadians = Phaser.Math.DegToRad(this.angle - 90);
@@ -298,6 +326,20 @@ export class Ship extends Phaser.GameObjects.Sprite {
                     });
                     this.lastShotTime = currentTime;
                 }
+            }
+        }
+
+        if(this._currentJoystickFireButtonState === GameConstants.FIRE_BUTTON_DOWN) {
+            const currentTime = this.scene.time.now;
+            if (this.lastShotTime === undefined || currentTime - this.lastShotTime > 700) {
+                this.shoot();
+                this.scene.time.addEvent({
+                    delay: 100,
+                    callback: this.shoot,
+                    callbackScope: this,
+                    repeat: 1
+                });
+                this.lastShotTime = currentTime;
             }
         }
     }
