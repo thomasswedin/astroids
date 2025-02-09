@@ -75,7 +75,7 @@ export default defineComponent({
         },
         plugins: {
           global: [{
-            key: 'rexVirtualJoystick',
+            key: 'rexvirtualjoystickplugin',
             plugin: VirtualJoystickPlugin,
             start: true
           },

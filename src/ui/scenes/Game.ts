@@ -33,7 +33,7 @@ export class Game extends Phaser.Scene {
         this._livesPanel = new LivesPanel(this, this.cameras.main.width - 100, 0);
         
         this._keypad = new MKeypad(this, 200, 560);
-        
+
         new TileTextComponent(this, 300, 26, 'ASTROIDS');
         //new TileTextComponent(currentScene, 286, 200, 'GAME OVER');
 

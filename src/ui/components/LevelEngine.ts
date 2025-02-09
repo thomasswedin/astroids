@@ -92,7 +92,6 @@ export class LevelEngine {
         }
     }
 
-
     public newLife(scene: Phaser.Scene) {
         this._ship = new Ship(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 2);
         this.addShipColliders();
