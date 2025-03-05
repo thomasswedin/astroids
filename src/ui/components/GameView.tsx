@@ -4,7 +4,6 @@ import { defineComponent, inject, onMounted, ref, watch } from 'vue';
 import type { IUIServices } from '../../UIController';
 import { servicesKey } from '../../UIController';
 import { UIDataManager } from "../data/UIDataManager";
-import { UIEventManager } from "../events/ui/UIEventManager";
 import { Game } from '../scenes/Game';
 import { Menu } from '../scenes/Menu';
 import { Preloader } from '../scenes/Preloader';
@@ -18,7 +17,7 @@ export default defineComponent({
     const gameOver = ref(false);
 
     const services: IUIServices = inject(servicesKey) as IUIServices;
-    const uiEventManager: UIEventManager = services.uiEventManager;
+    //const uiEventManager: UIEventManager = services.uiEventManager;
     const uiDataManager: UIDataManager = services.dataManager;
 
 

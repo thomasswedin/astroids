@@ -3,7 +3,7 @@ import { GameConstants } from '../../../constants/GameConstants';
 export class MKeypad extends Phaser.GameObjects.Graphics {
 
     private _joyStick: any;
-    private _fireButton: any;
+    //private _fireButton: any;
     private _currentScene: Phaser.Scene;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -28,10 +28,10 @@ export class MKeypad extends Phaser.GameObjects.Graphics {
 
             this.dumpJoyStickState();
 
-            this._fireButton = this.createFireButtonGameObject(scene)
+            /*this._fireButton = this.createFireButtonGameObject(scene)
             .setInteractive()
             .on('pointerdown', this.dumpButtonState, this)
-            .on('pointerup', this.dumpButtonState, this);
+            .on('pointerup', this.dumpButtonState, this);*/
 
             /*
             let leftKeyDown = this._joyStick.left;
@@ -54,10 +54,10 @@ export class MKeypad extends Phaser.GameObjects.Graphics {
         return scene.add.circle(0, 0, 25, 0xaaaaaa, 0.3);
     }
 
-    private createFireButtonGameObject(scene: Phaser.Scene): Phaser.GameObjects.GameObject {
+    /*private createFireButtonGameObject(scene: Phaser.Scene): Phaser.GameObjects.GameObject {
         // Create and return the fire button game object here
         return scene.add.circle(1040, 560, 50, 0x888888, 0.3);
-    }
+    }*/
 
     dumpJoyStickState() {
         const leftKeyDown = this._joyStick.left;
